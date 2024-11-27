@@ -1,0 +1,87 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\GitHub\\Crossy_Road_Replica\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{818D2B59-71DA-474A-929F-24E318C1FE31}|Crossy_Road_Replica.vcxproj|C:\\GitHub\\Crossy_Road_Replica\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{818D2B59-71DA-474A-929F-24E318C1FE31}|Crossy_Road_Replica.vcxproj|solutionrelative:main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{818D2B59-71DA-474A-929F-24E318C1FE31}|Crossy_Road_Replica.vcxproj|C:\\GitHub\\Crossy_Road_Replica\\vertexShader.glsl||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{818D2B59-71DA-474A-929F-24E318C1FE31}|Crossy_Road_Replica.vcxproj|solutionrelative:vertexShader.glsl||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{818D2B59-71DA-474A-929F-24E318C1FE31}|Crossy_Road_Replica.vcxproj|C:\\GitHub\\Crossy_Road_Replica\\fragmentShader.glsl||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{818D2B59-71DA-474A-929F-24E318C1FE31}|Crossy_Road_Replica.vcxproj|solutionrelative:fragmentShader.glsl||{8B382828-6202-11D1-8870-0000F87579D2}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 6,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "vertexShader.glsl",
+              "DocumentMoniker": "C:\\GitHub\\Crossy_Road_Replica\\vertexShader.glsl",
+              "RelativeDocumentMoniker": "vertexShader.glsl",
+              "ToolTip": "C:\\GitHub\\Crossy_Road_Replica\\vertexShader.glsl",
+              "RelativeToolTip": "vertexShader.glsl",
+              "ViewState": "AQIAAAAAAAAAAAAAAADwvwgAAAAYAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2024-11-27T10:07:24.873Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "fragmentShader.glsl",
+              "DocumentMoniker": "C:\\GitHub\\Crossy_Road_Replica\\fragmentShader.glsl",
+              "RelativeDocumentMoniker": "fragmentShader.glsl",
+              "ToolTip": "C:\\GitHub\\Crossy_Road_Replica\\fragmentShader.glsl",
+              "RelativeToolTip": "fragmentShader.glsl",
+              "ViewState": "AQIAAAAAAAAAAAAAAADwvwAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2024-11-27T10:07:21.559Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "main.cpp",
+              "DocumentMoniker": "C:\\GitHub\\Crossy_Road_Replica\\main.cpp",
+              "RelativeDocumentMoniker": "main.cpp",
+              "ToolTip": "C:\\GitHub\\Crossy_Road_Replica\\main.cpp",
+              "RelativeToolTip": "main.cpp",
+              "ViewState": "AQIAACEAAAAAAAAAAAAAAGgAAAARAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-11-27T10:03:03.916Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

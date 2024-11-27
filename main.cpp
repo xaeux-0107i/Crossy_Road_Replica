@@ -1,7 +1,5 @@
 // 필요한 헤더파일 선언
 #define _CRT_SECURE_NO_WARNINGS
-#define PI 3.141592
-#define LEN 0.8
 
 #include <gl/glew.h>
 #include <iostream>
@@ -12,8 +10,6 @@
 #include <gl/glm/gtc/matrix_transform.hpp>
 #include <stdlib.h>
 #include <stdio.h>
-#include <random>
-#include <math.h>
 
 void make_vertexShaders();
 void make_fragmentShaders();
@@ -35,8 +31,6 @@ GLuint shaderProgramID; // 셰이더 프로그램 이름
 GLuint vertexShader; // 버텍스 셰이더 객체
 GLuint fragmentShader; // 프래그먼트 세이더
 GLchar* vertexSource, * fragmentSource; // 소스코드 저장 변수
-
-
 
 int msecs = 30;
 
@@ -114,7 +108,7 @@ void make_vertexShaders()
 	// 버텍스 세이더 읽어 저장하고 컴파일하기
 	// filetobuf - 사용자 정의 함수로 텍스트 파일을 읽어서 문자열에 저장하는 함수
 
-	vertexSource = filetobuf("vertexShader_13.glsl");
+	vertexSource = filetobuf("vertexShader.glsl");
 	vertexShader = glCreateShader(GL_VERTEX_SHADER); // 버텍스 세이더 객체 생성
 	glShaderSource(vertexShader, 1, (const char**)&vertexSource, 0); // 세이더 코드 객체에 넣기
 	glCompileShader(vertexShader); // 버텍스 세이더 컴파일
@@ -134,7 +128,7 @@ void make_vertexShaders()
 void make_fragmentShaders()
 {
 	// 프래그먼트 세이더 읽어 저장하고 컴파일하기
-	fragmentSource = filetobuf("fragmentShader18.glsl"); // 프래그 세이더 읽어오기
+	fragmentSource = filetobuf("fragmentShader.glsl"); // 프래그 세이더 읽어오기
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, (const GLchar**)&fragmentSource, 0);
 	glCompileShader(fragmentShader);
@@ -192,12 +186,6 @@ GLvoid drawScene() {
 	glm::mat4 model = glm::mat4(1.0f);
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &model[0][0]);
 
-	//================================================================
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
-	// 정육면체 그리기
-	drawHexahedron(modelLoc, isSolidColorLoc);
-	glDisable(GL_CULL_FACE);
 	glutSwapBuffers(); // 화면에 출력
 }
 

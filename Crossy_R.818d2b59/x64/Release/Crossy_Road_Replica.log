@@ -1,0 +1,9 @@
+﻿  main.cpp
+C:\GitHub\Crossy_Road_Replica\main.cpp(52,1): warning C4326: 'main'의 반환 형식이 'int'이어야 하는데 'void'입니다.
+C:\GitHub\Crossy_Road_Replica\main.cpp(61,28): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\GitHub\Crossy_Road_Replica\main.cpp(61,21): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  코드를 생성하고 있습니다.
+  Previous IPDB not found, fall back to full compilation.
+  All 57 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  코드를 생성했습니다.
+  Crossy_Road_Replica.vcxproj -> C:\GitHub\Crossy_Road_Replica\x64\Release\Crossy_Road_Replica.exe
