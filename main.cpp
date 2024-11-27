@@ -25,12 +25,11 @@ void TimerFunction(int v);
 void drawHexahedron(GLint, GLint);
 int winID;
 
-// 필요한 변수 선언
 GLint width = 800, height = 600;
-GLuint shaderProgramID; // 셰이더 프로그램 이름
-GLuint vertexShader; // 버텍스 셰이더 객체
+GLuint shaderProgramID; 
+GLuint vertexShader; // 버텍스 셰이더
 GLuint fragmentShader; // 프래그먼트 세이더
-GLchar* vertexSource, * fragmentSource; // 소스코드 저장 변수
+GLchar* vertexSource, * fragmentSource; 
 
 int msecs = 30;
 
@@ -43,36 +42,33 @@ glm::mat4 view = glm::lookAt(
 glm::mat4 projection = glm::perspective(
 	glm::radians(45.0f), // 시야각
 	(float)width / (float)height, // 화면 비율
-	0.1f, 100.0f // 근거리 및 원거리 클리핑 평면
+	0.1f, 100.0f // 근거리 및 원거리 클리핑 
 );
 
-
+//
 // 메인 함수
 void main(int argc, char** argv)
 {
-	// OpenGL 좌표계로 변환을 위한 상수
 	float width = 800.0f;
 	float height = 600.0f;
 
-	// 윈도우 생성하기
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(width, height);
 	winID = glutCreateWindow("Example1");
 
-	// GLEW 초기화
 	glewExperimental = GL_TRUE;
 	glewInit();
 
-	// 세이더 읽어와서 세이더 프로그램 만들기
-	make_shaderProgram(); // 세이더 프로그램 만들기
+	make_shaderProgram(); 
 	InitBuffer();
 
-	glutDisplayFunc(drawScene); // 출력 콜백 함수
-	glutKeyboardFunc(Keyboard); // 키보드 입력
-	glutSpecialFunc(SpecialKeys); // 특수 키 콜백 함수 등록
-	glutMouseFunc(Mouse); // 마우스 입력
+	glutDisplayFunc(drawScene); 
+	glutKeyboardFunc(Keyboard); 
+	glutSpecialFunc(SpecialKeys); 
+	glutMouseFunc(Mouse); 
 	glutReshapeFunc(Reshape);
 	glutTimerFunc(msecs, TimerFunction, 1); // 타이머 함수 설정
 	glutMainLoop();
@@ -87,7 +83,7 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 }
 
 GLvoid SpecialKeys(int key, int x, int y) {
-	glutPostRedisplay(); // 화면 재출력
+	glutPostRedisplay(); 
 }
 
 void Mouse(int button, int state, int x, int y) {
@@ -102,18 +98,13 @@ void Mouse(int button, int state, int x, int y) {
 	glutPostRedisplay(); // 화면 재출력
 }
 
-// 버텍스 세이더 객체 만들기
 void make_vertexShaders()
 {
-	// 버텍스 세이더 읽어 저장하고 컴파일하기
-	// filetobuf - 사용자 정의 함수로 텍스트 파일을 읽어서 문자열에 저장하는 함수
 
 	vertexSource = filetobuf("vertexShader.glsl");
-	vertexShader = glCreateShader(GL_VERTEX_SHADER); // 버텍스 세이더 객체 생성
-	glShaderSource(vertexShader, 1, (const char**)&vertexSource, 0); // 세이더 코드 객체에 넣기
-	glCompileShader(vertexShader); // 버텍스 세이더 컴파일
-
-	// 에러체크
+	vertexShader = glCreateShader(GL_VERTEX_SHADER); 
+	glShaderSource(vertexShader, 1, (const char**)&vertexSource, 0); 
+	glCompileShader(vertexShader); 
 	GLint result;
 	GLchar errorLog[512];
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &result);
@@ -124,10 +115,9 @@ void make_vertexShaders()
 	}
 }
 
-// 프래그먼트 세이더 객체 만들기
+
 void make_fragmentShaders()
 {
-	// 프래그먼트 세이더 읽어 저장하고 컴파일하기
 	fragmentSource = filetobuf("fragmentShader.glsl"); // 프래그 세이더 읽어오기
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, (const GLchar**)&fragmentSource, 0);
