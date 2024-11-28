@@ -13,6 +13,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include "map_object.h"
 
 void make_vertexShaders();
 void make_fragmentShaders();
@@ -42,7 +43,7 @@ GLuint VAO[2];
 GLuint VBO[2];
 
 float cameraX = 0.0f;
-float cameraY = 0.0f;
+float cameraY = 3.0f;
 float cameraZ = 5.0f;
 
 float lightX = 2.0f;
@@ -184,10 +185,21 @@ GLvoid INITBuffer()
 	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(sizeof(float) * 3));
 	//glEnableVertexAttribArray(1);
 
-	//// 이 데이터가 어떤 데이터인지, 우리가 정의를 했기 때문에, openGL에 알려줘야 한다!
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(sizeof(float) * 6));
-	// location, 갯수, 타입, nomalized?, 간격(바이트), 시작오프셋
-	glEnableVertexAttribArray(1);
+	glBindVertexArray(VAO[1]);     // VAO 바인딩
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]); // VBO 바인딩
+
+	vertexData = readOBJ("cube.obj");
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexData.size() * 3, vertexData.data(), GL_STATIC_DRAW);
+
+	vertexCount[1] = vertexData.size() / 3;
+
+	// 버텍스 위치 (location = 0)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	glEnableVertexAttribArray(0);
+
+	// 노멀 데이터 (location = 1)
+	//glvertexattribpointer(1, 3, gl_float, gl_false, sizeof(float) * 9, reinterpret_cast<void*>(sizeof(float) * 3));
+	//glenablevertexattribarray(1);
 
 	glBindVertexArray(0);
 }
@@ -297,7 +309,6 @@ void make_shaderProgram() {
 }
 
 
-
 GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 {
 
@@ -305,9 +316,10 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 
 	GLfloat rColor, gColor, bColor;
 	//rbb --> float 값으로 변경한 색상값
-	rColor = 0.678;
-	gColor = 0.882;
-	bColor = 0.396;
+	//rColor = 0.678;
+	//gColor = 0.882;
+	//bColor = 0.396;
+	rColor = gColor = bColor = 1.0f;
 	glClearColor(rColor, gColor, bColor, 1.0f);
 	//glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);															 // 깊이 테스트 활성화
@@ -353,14 +365,14 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 	//objectColor = glm::vec3(1.0f, 0.0f, 0.0f); // 물체 색상
 	//glUniform3fv(glGetUniformLocation(shaderProgramID, "objectColor"), 1, &objectColor[0]);
 	//오리
-	model = glm::mat4(1.0f);
+	/*model = glm::mat4(1.0f);
 	model = glm::scale(model, glm::vec3(70.0f, 70.0f, 70.0f));
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &model[0][0]);
 	glBindVertexArray(VAO[0]);
-	glDrawArrays(GL_TRIANGLES, 0, vertexCount[0]);
+	glDrawArrays(GL_TRIANGLES, 0, vertexCount[0]);*/
 
-
-	glBindVertexArray(0);
+	//타일 그리기
+	draw_grass(modelLoc, objectColor,glm::vec3(0,0,0));
 	glutSwapBuffers(); // 화면에 출력하기
 }
 GLvoid Reshape(int w, int h) {
