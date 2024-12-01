@@ -14,6 +14,7 @@
 #include <iostream>
 #include <vector>
 #include "map_object.h"
+#include "duck.h"
 
 void make_vertexShaders();
 void make_fragmentShaders();
@@ -28,7 +29,7 @@ void TimerFunction(int v);
 GLvoid INITBuffer();
 
 std::vector<glm::vec3> readOBJ(std::string filename);
-GLuint vertexCount[2];
+GLuint vertexCount[3];
 
 GLint width = 800, height = 600;
 GLuint shaderProgramID; 
@@ -39,8 +40,8 @@ GLchar* vertexSource, * fragmentSource;
 int msecs = 30;
 
 //charcter
-GLuint VAO[2];
-GLuint VBO[2];
+GLuint VAO[3];
+GLuint VBO[3];
 
 float cameraX = 0.0f;
 float cameraY = 3.0f;
@@ -173,7 +174,7 @@ GLvoid INITBuffer()
 	glBindVertexArray(VAO[0]);     // VAO 바인딩
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]); // VBO 바인딩
 
-	std::vector<glm::vec3>vertexData = readOBJ("duck.obj");
+	std::vector<glm::vec3>vertexData = readOBJ("body.obj");
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexData.size() * 3, vertexData.data(), GL_STATIC_DRAW);
 
 	vertexCount[0] = vertexData.size() / 3;
@@ -197,9 +198,17 @@ GLvoid INITBuffer()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
 	glEnableVertexAttribArray(0);
 
-	// 노멀 데이터 (location = 1)
-	//glvertexattribpointer(1, 3, gl_float, gl_false, sizeof(float) * 9, reinterpret_cast<void*>(sizeof(float) * 3));
-	//glenablevertexattribarray(1);
+	glBindVertexArray(VAO[2]);     // VAO 바인딩
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]); // VBO 바인딩
+
+	vertexData = readOBJ("leg.obj");
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexData.size() * 3, vertexData.data(), GL_STATIC_DRAW);
+
+	vertexCount[2] = vertexData.size() / 3;
+
+	// 버텍스 위치 (location = 0)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	glEnableVertexAttribArray(0);
 
 	glBindVertexArray(0);
 }
@@ -355,24 +364,17 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 	//model = glm::rotate(model, glm::radians(15.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // x축으로 10도 회전
 	//model = glm::rotate(model, glm::radians(15.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // y축으로 10도 회전
 
-
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &model[0][0]);
 
 	glUseProgram(shaderProgramID);
 
-	glBindVertexArray(VAO[0]);
-
-	//objectColor = glm::vec3(1.0f, 0.0f, 0.0f); // 물체 색상
-	//glUniform3fv(glGetUniformLocation(shaderProgramID, "objectColor"), 1, &objectColor[0]);
+	//
 	//오리
-	/*model = glm::mat4(1.0f);
-	model = glm::scale(model, glm::vec3(70.0f, 70.0f, 70.0f));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &model[0][0]);
-	glBindVertexArray(VAO[0]);
-	glDrawArrays(GL_TRIANGLES, 0, vertexCount[0]);*/
+	//duck(modelLoc, objectColor, glm::vec3(0, 0, 0));
 
 	//타일 그리기
 	draw_grass(modelLoc, objectColor,glm::vec3(0,0,0));
+
 	glutSwapBuffers(); // 화면에 출력하기
 }
 GLvoid Reshape(int w, int h) {
