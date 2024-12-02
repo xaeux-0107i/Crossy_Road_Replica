@@ -27,6 +27,7 @@ GLvoid SpecialKeys(int, int, int);
 void Mouse(int, int, int, int);
 void TimerFunction(int v);
 GLvoid INITBuffer();
+GLvoid DuckBuffer();
 
 std::vector<glm::vec3> readOBJ(std::string filename);
 GLuint vertexCount[3];
@@ -43,8 +44,12 @@ int msecs = 30;
 GLuint VAO[3];
 GLuint VBO[3];
 
+GLuint Duck_VAO[3];
+GLuint Duck_VBO[3];
+GLuint Duck_vertexCount[3];
+
 float cameraX = 0.0f;
-float cameraY = 3.0f;
+float cameraY = 2.0f;
 float cameraZ = 5.0f;
 
 float lightX = 2.0f;
@@ -165,31 +170,67 @@ std::vector<glm::vec3> readOBJ(std::string filename)
 //
 // 메인 함수
 
-GLvoid INITBuffer()
+GLvoid DuckBuffer()
 {
+	glGenVertexArrays(4, Duck_VAO); // VAO 생성
+	glGenBuffers(4, Duck_VBO);      // VBO 생성
 
-	glGenVertexArrays(2, VAO); // VAO 생성
-	glGenBuffers(2, VBO);      // VBO 생성
+	glBindVertexArray(Duck_VAO[0]);     // VAO 바인딩
+	glBindBuffer(GL_ARRAY_BUFFER, Duck_VBO[0]); // VBO 바인딩
 
-	glBindVertexArray(VAO[0]);     // VAO 바인딩
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]); // VBO 바인딩
+	std::vector<glm::vec3>Duck_vertexData = readOBJ("body.obj");
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * Duck_vertexData.size() * 3, Duck_vertexData.data(), GL_STATIC_DRAW);
 
-	std::vector<glm::vec3>vertexData = readOBJ("body.obj");
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexData.size() * 3, vertexData.data(), GL_STATIC_DRAW);
+	Duck_vertexCount[0] = Duck_vertexData.size() / 3;
 
-	vertexCount[0] = vertexData.size() / 3;
-
-	// 버텍스 위치 (location = 0)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
 	glEnableVertexAttribArray(0);
-	// 노멀 데이터 (location = 1)
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(sizeof(float) * 3));
-	//glEnableVertexAttribArray(1);
+
+	glBindVertexArray(Duck_VAO[1]);     // VAO 바인딩
+	glBindBuffer(GL_ARRAY_BUFFER, Duck_VBO[1]); // VBO 바인딩
+
+	Duck_vertexData = readOBJ("leg.obj");
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * Duck_vertexData.size() * 3, Duck_vertexData.data(), GL_STATIC_DRAW);
+
+	Duck_vertexCount[1] = Duck_vertexData.size() / 3;
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	glEnableVertexAttribArray(0);
+
+	glBindVertexArray(Duck_VAO[2]);     // VAO 바인딩
+	glBindBuffer(GL_ARRAY_BUFFER, Duck_VBO[2]); // VBO 바인딩
+
+	Duck_vertexData = readOBJ("mouth.obj");
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * Duck_vertexData.size() * 3, Duck_vertexData.data(), GL_STATIC_DRAW);
+
+	Duck_vertexCount[2] = Duck_vertexData.size() / 3;
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	glEnableVertexAttribArray(0);
+
+	glBindVertexArray(Duck_VAO[3]);     // VAO 바인딩
+	glBindBuffer(GL_ARRAY_BUFFER, Duck_VBO[3]); // VBO 바인딩
+
+	Duck_vertexData = readOBJ("head.obj");
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * Duck_vertexData.size() * 3, Duck_vertexData.data(), GL_STATIC_DRAW);
+
+	Duck_vertexCount[3] = Duck_vertexData.size() / 3;
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	glEnableVertexAttribArray(0);
+
+	glBindVertexArray(0);
+}
+
+GLvoid INITBuffer()
+{
+	glGenVertexArrays(2, VAO); // VAO 생성
+	glGenBuffers(2, VBO);      // VBO 생성
 
 	glBindVertexArray(VAO[1]);     // VAO 바인딩
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]); // VBO 바인딩
 
-	vertexData = readOBJ("cube.obj");
+	std::vector < glm::vec3> vertexData = readOBJ("cube.obj");
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexData.size() * 3, vertexData.data(), GL_STATIC_DRAW);
 
 	vertexCount[1] = vertexData.size() / 3;
@@ -198,17 +239,6 @@ GLvoid INITBuffer()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
 	glEnableVertexAttribArray(0);
 
-	glBindVertexArray(VAO[2]);     // VAO 바인딩
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]); // VBO 바인딩
-
-	vertexData = readOBJ("leg.obj");
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexData.size() * 3, vertexData.data(), GL_STATIC_DRAW);
-
-	vertexCount[2] = vertexData.size() / 3;
-
-	// 버텍스 위치 (location = 0)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
-	glEnableVertexAttribArray(0);
 
 	glBindVertexArray(0);
 }
@@ -230,6 +260,7 @@ void main(int argc, char** argv)
 
 	make_shaderProgram(); 
 	INITBuffer();
+	DuckBuffer();
 
 	glutDisplayFunc(drawScene); 
 	glutKeyboardFunc(Keyboard); 
@@ -370,7 +401,7 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 
 	//
 	//오리
-	//duck(modelLoc, objectColor, glm::vec3(0, 0, 0));
+	duck(modelLoc, objectColor, glm::vec3(0, 0, 0));
 
 	//타일 그리기
 	draw_grass(modelLoc, objectColor,glm::vec3(0,0,0));
