@@ -37,6 +37,7 @@ void duck(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos) {
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &model[0][0]);
 	glBindVertexArray(Duck_VAO[2]);
 	glDrawArrays(GL_TRIANGLES, 0, Duck_vertexCount[0]);
+
 	//¸Ó¸®
 	glBindVertexArray(Duck_VAO[3]);
 	glUniform3fv(glGetUniformLocation(shaderProgramID, "objectColor"), 1, &objectColor[0]);

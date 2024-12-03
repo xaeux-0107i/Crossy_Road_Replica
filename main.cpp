@@ -44,17 +44,17 @@ int msecs = 30;
 GLuint VAO[3];
 GLuint VBO[3];
 
-GLuint Duck_VAO[3];
-GLuint Duck_VBO[3];
-GLuint Duck_vertexCount[3];
+GLuint Duck_VAO[4];
+GLuint Duck_VBO[4];
+GLuint Duck_vertexCount[4];
 
 float cameraX = 0.0f;
 float cameraY = 2.0f;
 float cameraZ = 5.0f;
 
-float lightX = 2.0f;
-float lightZ = 2.0f;
-float lightY = 0.0f;
+float lightX = 0.0f;
+float lightZ = 0.0f;
+float lightY = 10.0f;
 
 
 glm::mat4 view = glm::lookAt(
@@ -185,6 +185,8 @@ GLvoid DuckBuffer()
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(sizeof(float) * 6));
+	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(Duck_VAO[1]);     // VAO 바인딩
 	glBindBuffer(GL_ARRAY_BUFFER, Duck_VBO[1]); // VBO 바인딩
@@ -196,6 +198,8 @@ GLvoid DuckBuffer()
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(sizeof(float) * 6));
+	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(Duck_VAO[2]);     // VAO 바인딩
 	glBindBuffer(GL_ARRAY_BUFFER, Duck_VBO[2]); // VBO 바인딩
@@ -207,6 +211,8 @@ GLvoid DuckBuffer()
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(sizeof(float) * 6));
+	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(Duck_VAO[3]);     // VAO 바인딩
 	glBindBuffer(GL_ARRAY_BUFFER, Duck_VBO[3]); // VBO 바인딩
@@ -218,6 +224,8 @@ GLvoid DuckBuffer()
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(sizeof(float) * 6));
+	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(0);
 }
@@ -238,6 +246,8 @@ GLvoid INITBuffer()
 	// 버텍스 위치 (location = 0)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(sizeof(float) * 6));
+	glEnableVertexAttribArray(1);
 
 
 	glBindVertexArray(0);
@@ -408,6 +418,7 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 
 	glutSwapBuffers(); // 화면에 출력하기
 }
+
 GLvoid Reshape(int w, int h) {
 	glViewport(0, 0, w, h);
 }
