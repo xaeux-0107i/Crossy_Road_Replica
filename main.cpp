@@ -50,7 +50,7 @@ GLuint Duck_VBO[4];
 GLuint Duck_vertexCount[4];
 
 float cameraX = 0.0f;
-float cameraY = 5.0f;
+float cameraY = 10.0f;
 float cameraZ = 5.0f;
 
 float lightX = 0.0f;
@@ -294,19 +294,31 @@ void main(int argc, char** argv)
 GLvoid Keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 'w':
-		for (int i = 0; i < numOfLines; i++) {
-			for (int j = 0; j < 9; j++) {
+		for (int i = 0; i < numOfLines; i++) { // 맵 이동
+			for (int j = 0; j < 15; j++) {
 				line[i].floorPosition[j].z += 1;
 			}
-			if (line[i].floorPosition[0].z > 3) {
+			if (line[i].floorPosition[0].z > 5) {
 				create_new_line(i);
+			}
+		}
+
+		for (int i = 0; i < 100; i++) { // 자동 이동
+			if (car[i].active) {
+				car[i].pos.z += 1;
 			}
 		}
 		break;
 	case 's':
-		for (int i = 0; i < numOfLines; i++) {
-			for (int j = 0; j < 9; j++) {
+		for (int i = 0; i < numOfLines; i++) { // 맵 이동
+			for (int j = 0; j < 15; j++) {
 				line[i].floorPosition[j].z -= 1;
+			}
+		}
+
+		for (int i = 0; i < 100; i++) { // 자동차 이동
+			if (car[i].active) {
+				car[i].pos.z -= 1;
 			}
 		}
 		break;
@@ -440,11 +452,11 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 
 	//
 	//오리
-	//duck(modelLoc, objectColor, glm::vec3(0, 0, 0), 30.0f);
+	duck(modelLoc, objectColor, glm::vec3(0, 0, 0), 30.0f);
 
 	//타일 그리기
 	for (int i = 0; i < numOfLines; i++) {
-		for (int j = 0; j < 9; j++) {
+		for (int j = 0; j < 15; j++) {
 			switch (line[i].floorType) {
 			case 0: // 풀밭
 				draw_grass(modelLoc, objectColor, line[i].floorPosition[j]);

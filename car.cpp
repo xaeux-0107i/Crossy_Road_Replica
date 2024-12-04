@@ -203,7 +203,7 @@ void Car::createCar(float sp, glm::vec3 position, int n, int d) {
 	// 위치 설정
 	pos = position;
 	if (direction == 1) {
-		pos.x += 8;
+		pos.x += 14;
 	}
 	switch (c) { // 색상 설정
 	case 0:

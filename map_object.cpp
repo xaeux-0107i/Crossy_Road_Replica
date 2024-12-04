@@ -17,13 +17,12 @@ std::uniform_int_distribution<> uidTime(2,4);
 std::uniform_real_distribution<> urdS(0.03, 0.06f);
 std::uniform_int_distribution<> urdD(0, 1);
 
-int treeType[5][9] = {
-	{1, 1, 0, 0, 0, 0, 0, 1, 1},
-	{1, 1, 0, 0, 0, 1, 0, 1, 1},
-	{1, 1, 0, 1, 0, 0, 0, 1, 1},
-	{1, 1, 1, 0, 0, 0, 0, 1, 1},
-	{1, 1, 0, 0, 0, 0, 1, 1, 1}
-
+int treeType[5][15] = {
+	{1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1},
+	{1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1},
+	{1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1},
+	{1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1},
+	{1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1}
 };
 
 // 타일 하나 당 한 변의 길이 = 1.0
@@ -92,11 +91,11 @@ void create_new_line(int i) {
 	int tree = uidT(gen); // 나무 위치 결정
 	line[i].speed = urdS(gen); // 자동차 속도 설정
 	line[i].spawnTime = uidTime(gen); // 자동차 생성 시간 설정
-	for (int k = 0; k < 9; k++) {
+	for (int k = 0; k < 15; k++) {
 		line[i].isTree[k] = treeType[tree][k];
 	}
-	for (int j = 0; j < 9; j++) { // 타일 위치 지정
-		line[i].floorPosition[j] = glm::vec3(j - 4.0, 0.0, line[i].floorPosition[j].z - 15);
+	for (int j = 0; j < 15; j++) { // 타일 위치 지정
+		line[i].floorPosition[j] = glm::vec3(j - 7.0, 0.0, line[i].floorPosition[j].z - 16);
 	}
 	line[i].direction = urdD(gen);
 	line[i].start_time = std::time(nullptr);
@@ -107,22 +106,22 @@ void init_lines() {
 
 		if (i < 4) {
 			line[i].floorType = 0;
-			for (int k = 0; k < 9; k++) {
+			for (int k = 0; k < 15; k++) {
 				line[i].isTree[k] = treeType[0][k];
 			}
 		}
 		else {
 			line[i].floorType = uid(gen);
 			int tree = uidT(gen);
-			for (int k = 0; k < 9; k++) {
+			for (int k = 0; k < 15; k++) {
 				line[i].isTree[k] = treeType[tree][k];
 			}
 			line[i].speed = urdS(gen); // 자동차 속도 설정
 			line[i].spawnTime = uidTime(gen); // 자동차 생성 시간 설정
 		}
 
-		for (int j = 0; j < 9; j++) { // 타일 위치 지정
-			line[i].floorPosition[j] = glm::vec3(j - 4.0, 0.0, 2-i);
+		for (int j = 0; j < 15; j++) { // 타일 위치 지정
+			line[i].floorPosition[j] = glm::vec3(j - 7.0, 0.0, 2-i);
 		}
 
 		line[i].start_time = std::time(nullptr);

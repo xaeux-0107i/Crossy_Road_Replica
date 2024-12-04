@@ -11,8 +11,8 @@
 
 struct Line {
 	int floorType; // 0 : 풀, 1 : 도로
-	glm::vec3 floorPosition[9]; // 한 라인 당 9칸
-	bool isTree[9];
+	glm::vec3 floorPosition[15]; // 한 라인 당 15칸
+	bool isTree[15];
 	float speed; // 자동차 속도
 	int spawnTime; // 자동차 스폰 시간
 	std::time_t start_time;
