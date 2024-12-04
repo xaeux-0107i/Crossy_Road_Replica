@@ -15,6 +15,7 @@
 #include <vector>
 #include "map_object.h"
 #include "duck.h"
+#include "car.h"
 
 void make_vertexShaders();
 void make_fragmentShaders();
@@ -404,6 +405,7 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 		glm::vec3(0.0f, 0.0f, 0.0f), // 카메라가 바라보는 대상
 		glm::vec3(0.0f, 1.0f, 0.0f)  // 카메라의 업 벡터
 	);
+
 	// 셰이더 내 유니폼 변수 위치 찾기
 	GLint viewLoc = glGetUniformLocation(shaderProgramID, "view");
 	GLint projLoc = glGetUniformLocation(shaderProgramID, "projection");
