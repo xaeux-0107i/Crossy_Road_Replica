@@ -49,8 +49,8 @@ GLuint Duck_VBO[4];
 GLuint Duck_vertexCount[4];
 
 float cameraX = 0.0f;
-float cameraY = 2.0f;
-float cameraZ = 5.0f;
+float cameraY = 3.0f;
+float cameraZ = 4.0f;
 
 float lightX = 0.0f;
 float lightZ = 0.0f;
@@ -69,6 +69,9 @@ glm::mat4 projection = glm::perspective(
 	0.1f, 100.0f // 근거리 및 원거리 클리핑 
 );
 
+// 맵
+Line line[16];
+int numOfLines = 16;
 
 char* filetobuf(const char* file) {
 	FILE* fptr;
@@ -258,6 +261,8 @@ void main(int argc, char** argv)
 	float width = 800.0f;
 	float height = 600.0f;
 
+	// 맵 초기화
+	init_lines();
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
@@ -283,6 +288,25 @@ void main(int argc, char** argv)
 
 // 키보드
 GLvoid Keyboard(unsigned char key, int x, int y) {
+	switch (key) {
+	case 'w':
+		for (int i = 0; i < numOfLines; i++) {
+			for (int j = 0; j < 9; j++) {
+				line[i].floorPosition[j].z += 1;
+			}
+			if (line[i].floorPosition[0].z > 3) {
+				create_new_line(i);
+			}
+		}
+		break;
+	case 's':
+		for (int i = 0; i < numOfLines; i++) {
+			for (int j = 0; j < 9; j++) {
+				line[i].floorPosition[j].z -= 1;
+			}
+		}
+		break;
+	}
 	if (key != 'q') {
 		glutPostRedisplay(); // 화면 재출력
 	}
@@ -389,7 +413,7 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 	glm::vec3 lightPos(lightX, lightY, lightZ);
 	glm::vec3 viewPos(cameraX, cameraY, cameraZ);
 	glm::vec3 lightColor(1.0f, 1.0f, 1.0f); // 흰색 광원
-	glm::vec3 objectColor(1.0f, 1.0f, 0.0f); // 물체 색상
+	glm::vec3 objectColor(1.0f, 1.0f, 1.0f); // 물체 색상
 
 	glm::mat4 model = glm::mat4(1.0f);
 	glUniform3fv(glGetUniformLocation(shaderProgramID, "lightPos"), 1, &lightPos[0]);
@@ -411,10 +435,24 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 
 	//
 	//오리
-	duck(modelLoc, objectColor, glm::vec3(0, 0, 0));
+	duck(modelLoc, objectColor, glm::vec3(0, 0, 0), 30.0f);
 
 	//타일 그리기
-	draw_grass(modelLoc, objectColor,glm::vec3(0,0,0));
+	for (int i = 0; i < numOfLines; i++) {
+		for (int j = 0; j < 9; j++) {
+			switch (line[i].floorType) {
+			case 0: // 풀밭
+				draw_grass(modelLoc, objectColor, line[i].floorPosition[j]);
+				if (line[i].isTree[j] == 1) {
+					draw_tree(modelLoc, objectColor, line[i].floorPosition[j]);
+				}
+				break;
+			case 1: // 도로
+				draw_road(modelLoc, objectColor, line[i].floorPosition[j]);
+				break;
+			}
+		}
+	}
 
 	glutSwapBuffers(); // 화면에 출력하기
 }
