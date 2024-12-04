@@ -12,7 +12,7 @@
 struct Line {
 	int floorType; // 0 : 풀, 1 : 도로
 	glm::vec3 floorPosition[15]; // 한 라인 당 15칸
-	bool isTree[15];
+	int isTree[15];
 	float speed; // 자동차 속도
 	int spawnTime; // 자동차 스폰 시간
 	std::time_t start_time;
@@ -25,5 +25,6 @@ struct Line {
 void draw_grass(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos);
 void draw_road(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos);
 void draw_tree(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos);
+void draw_stone(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos);
 void create_new_line(int i);
 void init_lines();

@@ -18,11 +18,11 @@ std::uniform_real_distribution<> urdS(0.03, 0.06f);
 std::uniform_int_distribution<> urdD(0, 1);
 
 int treeType[5][15] = {
-	{1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1},
-	{1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1},
-	{1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1},
-	{1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1},
-	{1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1}
+	{1, 1, 1, 0, 0, 0, 0, 0, 0, 2, 0, 1, 1, 1, 1},
+	{1, 1, 1, 1, 0, 2, 0, 0, 0, 1, 0, 0, 1, 1, 1},
+	{1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 2, 0, 1, 1, 1},
+	{1, 1, 1, 1, 0, 1, 0, 0, 2, 1, 0, 0, 1, 1, 1},
+	{1, 1, 1, 0, 2, 1, 0, 0, 1, 0, 0, 2, 1, 1, 1}
 };
 
 // 타일 하나 당 한 변의 길이 = 1.0
@@ -86,6 +86,19 @@ void draw_tree(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos) {
 	glDrawArrays(GL_TRIANGLES, 0, vertexCount[1]);
 	glBindVertexArray(0);
 };
+void draw_stone(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos) {
+	objectColor = glm::vec3(0.5, 0.5, 0.5); // 회색
+	glUniform3fv(glGetUniformLocation(shaderProgramID, "objectColor"), 1, &objectColor[0]);
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, pos);
+	model = glm::translate(model, glm::vec3(0.0, 0.2, 0.0));
+	model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &model[0][0]);
+	glBindVertexArray(VAO[1]);
+	glDrawArrays(GL_TRIANGLES, 0, vertexCount[1]);
+	glBindVertexArray(0);
+};
 void create_new_line(int i) {
 	line[i].floorType = uid(gen); // 종류 결정
 	int tree = uidT(gen); // 나무 위치 결정
@@ -106,8 +119,9 @@ void init_lines() {
 
 		if (i < 4) {
 			line[i].floorType = 0;
+			int tree = uidT(gen);
 			for (int k = 0; k < 15; k++) {
-				line[i].isTree[k] = treeType[0][k];
+				line[i].isTree[k] = treeType[tree][k];
 			}
 		}
 		else {

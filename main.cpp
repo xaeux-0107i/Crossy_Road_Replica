@@ -463,6 +463,9 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 				if (line[i].isTree[j] == 1) {
 					draw_tree(modelLoc, objectColor, line[i].floorPosition[j]);
 				}
+				if (line[i].isTree[j] == 2) {
+					draw_stone(modelLoc, objectColor, line[i].floorPosition[j]);
+				}
 				break;
 			case 1: // 도로
 				draw_road(modelLoc, objectColor, line[i].floorPosition[j]);
