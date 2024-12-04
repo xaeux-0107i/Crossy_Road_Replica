@@ -7,11 +7,19 @@
 #include <gl/glm/ext.hpp>
 #include <gl/glm/gtc/matrix_transform.hpp>
 #include <random>
+#include <time.h>
 
 struct Line {
 	int floorType; // 0 : 풀, 1 : 도로
 	glm::vec3 floorPosition[9]; // 한 라인 당 9칸
 	bool isTree[9];
+	float speed; // 자동차 속도
+	int spawnTime; // 자동차 스폰 시간
+	std::time_t start_time;
+	int lineNum;
+	int direction;
+
+	void update_line();
 };
 
 void draw_grass(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos);

@@ -9,12 +9,14 @@
 #include <random>
 
 struct Car {
+	bool active = false;
 	glm::vec3 color;
 	glm::vec3 pos;
 	float speed;
 	int direction;
+	int lineNum;
 
 	void updateCar();
 	void drawCar(GLint modelLoc, glm::vec3 objectColor);
-	void createCar();
+	void createCar(float sp, glm::vec3 position, int n, int d);
 };

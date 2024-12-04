@@ -1,4 +1,5 @@
 #include "map_object.h"
+#include "car.h"
 
 extern GLuint vertexCount[2];
 extern GLuint VAO[2];
@@ -6,11 +7,15 @@ extern GLuint shaderProgramID;
 
 extern Line line[16];
 extern int numOfLines;
+extern Car car[100];
 
 std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_int_distribution<> uid(0, 1);
 std::uniform_int_distribution<> uidT(0, 4);
+std::uniform_int_distribution<> uidTime(2,4);
+std::uniform_real_distribution<> urdS(0.03, 0.06f);
+std::uniform_int_distribution<> urdD(0, 1);
 
 int treeType[5][9] = {
 	{1, 1, 0, 0, 0, 0, 0, 1, 1},
@@ -85,12 +90,16 @@ void draw_tree(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos) {
 void create_new_line(int i) {
 	line[i].floorType = uid(gen); // 종류 결정
 	int tree = uidT(gen); // 나무 위치 결정
+	line[i].speed = urdS(gen); // 자동차 속도 설정
+	line[i].spawnTime = uidTime(gen); // 자동차 생성 시간 설정
 	for (int k = 0; k < 9; k++) {
 		line[i].isTree[k] = treeType[tree][k];
 	}
 	for (int j = 0; j < 9; j++) { // 타일 위치 지정
 		line[i].floorPosition[j] = glm::vec3(j - 4.0, 0.0, line[i].floorPosition[j].z - 15);
 	}
+	line[i].direction = urdD(gen);
+	line[i].start_time = std::time(nullptr);
 };
 
 void init_lines() {
@@ -108,10 +117,29 @@ void init_lines() {
 			for (int k = 0; k < 9; k++) {
 				line[i].isTree[k] = treeType[tree][k];
 			}
+			line[i].speed = urdS(gen); // 자동차 속도 설정
+			line[i].spawnTime = uidTime(gen); // 자동차 생성 시간 설정
 		}
 
 		for (int j = 0; j < 9; j++) { // 타일 위치 지정
 			line[i].floorPosition[j] = glm::vec3(j - 4.0, 0.0, 2-i);
+		}
+
+		line[i].start_time = std::time(nullptr);
+		line[i].lineNum = i;
+		line[i].direction = urdD(gen);
+	}
+};
+
+void Line::update_line() {
+	std::time_t timeNow = std::time(nullptr);
+	if (timeNow - start_time >= spawnTime) {
+		for (int i = 0; i < 100; i++) {
+			if (!car[i].active) {
+				car[i].createCar(speed, floorPosition[0], lineNum, direction);
+				start_time = std::time(nullptr);
+				break;
+			}
 		}
 	}
 };

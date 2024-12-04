@@ -50,8 +50,8 @@ GLuint Duck_VBO[4];
 GLuint Duck_vertexCount[4];
 
 float cameraX = 0.0f;
-float cameraY = 3.0f;
-float cameraZ = 4.0f;
+float cameraY = 5.0f;
+float cameraZ = 5.0f;
 
 float lightX = 0.0f;
 float lightZ = 0.0f;
@@ -73,6 +73,9 @@ glm::mat4 projection = glm::perspective(
 // 맵
 Line line[16];
 int numOfLines = 16;
+
+// 자동차
+Car car[100];
 
 char* filetobuf(const char* file) {
 	FILE* fptr;
@@ -437,7 +440,7 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 
 	//
 	//오리
-	duck(modelLoc, objectColor, glm::vec3(0, 0, 0), 30.0f);
+	//duck(modelLoc, objectColor, glm::vec3(0, 0, 0), 30.0f);
 
 	//타일 그리기
 	for (int i = 0; i < numOfLines; i++) {
@@ -456,6 +459,13 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 		}
 	}
 
+	// 자동차 그리기
+	for (int i = 0; i < 100; i++) {
+		if (car[i].active) {
+			car[i].drawCar(modelLoc, objectColor);
+		}
+	}
+
 	glutSwapBuffers(); // 화면에 출력하기
 }
 
@@ -464,7 +474,13 @@ GLvoid Reshape(int w, int h) {
 }
 
 void TimerFunction(int v) {
+	for (int i = 0; i < 16; i++) {
+		if(line[i].floorType == 1) line[i].update_line();
+	}
 
+	for (int i = 0; i < 100; i++) {
+		car[i].updateCar();
+	}
 	glutPostRedisplay(); // 화면 재출력
 	glutTimerFunc(msecs, TimerFunction, 1); // 타이머 함수 설정
 }
