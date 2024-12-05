@@ -30,6 +30,7 @@ void TimerFunction(int v);
 GLvoid INITBuffer();
 GLvoid DuckBuffer();
 int isCollide(char key);
+int isCollideWithCar(glm::vec3 pos);
 
 std::vector<glm::vec3> readOBJ(std::string filename);
 GLuint vertexCount[3];
@@ -61,6 +62,7 @@ float lightY = 10.0f;
 float characterX = 0.0f;
 float duckDegree = 180.0;
 float duckHeight = 0.26;
+bool isAlive = true;
 
 glm::mat4 view = glm::lookAt(
 	glm::vec3(cameraX, cameraY, cameraZ), // 카메라 위치
@@ -298,7 +300,7 @@ void main(int argc, char** argv)
 GLvoid Keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 'w':
-		if (isCollide(key)) {
+		if (isCollide(key) && isAlive) {
 			for (int i = 0; i < numOfLines; i++) { // 맵 이동
 				for (int j = 0; j < 15; j++) {
 					line[i].floorPosition[j].z += 1;
@@ -317,7 +319,7 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		duckDegree = 180.0;
 		break;
 	case 's':
-		if (isCollide(key)) {
+		if (isCollide(key) && isAlive) {
 			for (int i = 0; i < numOfLines; i++) { // 맵 이동
 				for (int j = 0; j < 15; j++) {
 					line[i].floorPosition[j].z -= 1;
@@ -333,7 +335,7 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		duckDegree = 0.0;
 		break;
 	case 'd':
-		if (isCollide(key) && characterX != -7.0 ) {
+		if (isCollide(key) && characterX != -7.0 && isAlive) {
 			for (int i = 0; i < numOfLines; i++) { // 맵 이동
 				for (int j = 0; j < 15; j++) {
 					line[i].floorPosition[j].x -= 1;
@@ -351,7 +353,7 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		duckDegree = 90.0;
 		break;
 	case 'a':
-		if (isCollide(key) && characterX != 7.0) {
+		if (isCollide(key) && characterX != 7.0 && isAlive) {
 			for (int i = 0; i < numOfLines; i++) { // 맵 이동
 				for (int j = 0; j < 15; j++) {
 					line[i].floorPosition[j].x += 1;
@@ -495,7 +497,7 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 
 	//
 	//오리
-	duck(modelLoc, objectColor, glm::vec3(0, 0, 0), 30.0f, duckDegree, duckHeight);
+	if(isAlive) duck(modelLoc, objectColor, glm::vec3(0, 0, 0), 30.0f, duckDegree, duckHeight);
 
 	//타일 그리기
 	for (int i = 0; i < numOfLines; i++) {
@@ -537,7 +539,10 @@ void TimerFunction(int v) {
 	}
 
 	for (int i = 0; i < 100; i++) {
-		car[i].updateCar();
+		if (car[i].active) {
+			car[i].updateCar();
+			if (isCollideWithCar(car[i].pos)) isAlive = false;
+		}
 	}
 	glutPostRedisplay(); // 화면 재출력
 	glutTimerFunc(msecs, TimerFunction, 1); // 타이머 함수 설정
@@ -569,4 +574,14 @@ int isCollide(char key) {
 	}
 
 	return true;
+}
+
+int isCollideWithCar(glm::vec3 pos) {
+	// 자동차 x 너비 - 0.75, z 너비 - 0.4
+	// 캐릭터 x, z 너비 - 0.6
+	if (pos.x - 0.375 > 0 + 0.3) return false; // A의 왼쪽이 B의 오른쪽을 넘음
+	if (pos.x + 0.375 < 0 - 0.3) return false; // A의 오른쪽이 B의 왼쪽을 넘음
+	if (pos.z - 0.2 > 0 + 0.3) return false; // A의 아래쪽이 B의 위쪽을 넘음
+	if (pos.z + 0.2 / 2 < 0 - 0.3) return false; // A의 위쪽이 B의 아래쪽을 넘음
+	return true; // 충돌
 }
