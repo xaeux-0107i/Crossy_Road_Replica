@@ -59,7 +59,8 @@ float lightZ = 0.0f;
 float lightY = 10.0f;
 
 float characterX = 0.0f;
-
+float duckDegree = 180.0;
+float duckHeight = 0.26;
 
 glm::mat4 view = glm::lookAt(
 	glm::vec3(cameraX, cameraY, cameraZ), // 카메라 위치
@@ -313,6 +314,7 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 				}
 			}
 		}
+		duckDegree = 180.0;
 		break;
 	case 's':
 		if (isCollide(key)) {
@@ -328,6 +330,7 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 				}
 			}
 		}
+		duckDegree = 0.0;
 		break;
 	case 'd':
 		if (isCollide(key) && characterX != -7.0 ) {
@@ -345,6 +348,7 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 
 			characterX -= 1.0;
 		}
+		duckDegree = 90.0;
 		break;
 	case 'a':
 		if (isCollide(key) && characterX != 7.0) {
@@ -361,6 +365,7 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 			}
 			characterX += 1.0;
 		}
+		duckDegree = 270.0;
 		break;
 	}
 	if (key != 'q') {
@@ -402,7 +407,6 @@ void make_vertexShaders()
 	}
 }
 
-
 void make_fragmentShaders()
 {
 	fragmentSource = filetobuf("fragmentShader.glsl"); // 프래그 세이더 읽어오기
@@ -437,7 +441,6 @@ void make_shaderProgram() {
 
 	glUseProgram(shaderProgramID); // shader program 사용
 }
-
 
 GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 {
@@ -492,7 +495,7 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 
 	//
 	//오리
-	duck(modelLoc, objectColor, glm::vec3(0, 0, 0), 30.0f);
+	duck(modelLoc, objectColor, glm::vec3(0, 0, 0), 30.0f, duckDegree, duckHeight);
 
 	//타일 그리기
 	for (int i = 0; i < numOfLines; i++) {
