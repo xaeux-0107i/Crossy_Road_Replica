@@ -29,6 +29,7 @@ void Mouse(int, int, int, int);
 void TimerFunction(int v);
 GLvoid INITBuffer();
 GLvoid DuckBuffer();
+int isCollide(char key);
 
 std::vector<glm::vec3> readOBJ(std::string filename);
 GLuint vertexCount[3];
@@ -56,6 +57,8 @@ float cameraZ = 5.0f;
 float lightX = 0.0f;
 float lightZ = 0.0f;
 float lightY = 10.0f;
+
+float characterX = 0.0f;
 
 
 glm::mat4 view = glm::lookAt(
@@ -294,32 +297,69 @@ void main(int argc, char** argv)
 GLvoid Keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 'w':
-		for (int i = 0; i < numOfLines; i++) { // 맵 이동
-			for (int j = 0; j < 15; j++) {
-				line[i].floorPosition[j].z += 1;
+		if (isCollide(key)) {
+			for (int i = 0; i < numOfLines; i++) { // 맵 이동
+				for (int j = 0; j < 15; j++) {
+					line[i].floorPosition[j].z += 1;
+				}
+				if (line[i].floorPosition[0].z > 5) {
+					create_new_line(i);
+				}
 			}
-			if (line[i].floorPosition[0].z > 5) {
-				create_new_line(i);
-			}
-		}
 
-		for (int i = 0; i < 100; i++) { // 자동 이동
-			if (car[i].active) {
-				car[i].pos.z += 1;
+			for (int i = 0; i < 100; i++) { // 자동차 이동
+				if (car[i].active) {
+					car[i].pos.z += 1;
+				}
 			}
 		}
 		break;
 	case 's':
-		for (int i = 0; i < numOfLines; i++) { // 맵 이동
-			for (int j = 0; j < 15; j++) {
-				line[i].floorPosition[j].z -= 1;
+		if (isCollide(key)) {
+			for (int i = 0; i < numOfLines; i++) { // 맵 이동
+				for (int j = 0; j < 15; j++) {
+					line[i].floorPosition[j].z -= 1;
+				}
+			}
+
+			for (int i = 0; i < 100; i++) { // 자동차 이동
+				if (car[i].active) {
+					car[i].pos.z -= 1;
+				}
 			}
 		}
-
-		for (int i = 0; i < 100; i++) { // 자동차 이동
-			if (car[i].active) {
-				car[i].pos.z -= 1;
+		break;
+	case 'd':
+		if (isCollide(key) && characterX != -7.0 ) {
+			for (int i = 0; i < numOfLines; i++) { // 맵 이동
+				for (int j = 0; j < 15; j++) {
+					line[i].floorPosition[j].x -= 1;
+				}
 			}
+
+			for (int i = 0; i < 100; i++) { // 자동차 이동
+				if (car[i].active) {
+					car[i].pos.x -= 1;
+				}
+			}
+
+			characterX -= 1.0;
+		}
+		break;
+	case 'a':
+		if (isCollide(key) && characterX != 7.0) {
+			for (int i = 0; i < numOfLines; i++) { // 맵 이동
+				for (int j = 0; j < 15; j++) {
+					line[i].floorPosition[j].x += 1;
+				}
+			}
+
+			for (int i = 0; i < 100; i++) { // 자동차 이동
+				if (car[i].active) {
+					car[i].pos.x += 1;
+				}
+			}
+			characterX += 1.0;
 		}
 		break;
 	}
@@ -500,3 +540,30 @@ void TimerFunction(int v) {
 	glutTimerFunc(msecs, TimerFunction, 1); // 타이머 함수 설정
 }
 
+int isCollide(char key) {
+	glm::vec3 characterCoord;
+	switch (key) {
+	case 'w':
+		characterCoord = glm::vec3(0.0, 0.0, -1.0);
+		break;
+	case 'a':
+		characterCoord = glm::vec3(-1.0, 0.0, 0.0);
+		break;
+	case 'd':
+		characterCoord = glm::vec3(1.0, 0.0, 0.0);
+		break;
+	case 's':
+		characterCoord = glm::vec3(0.0, 0.0, 1.0);
+		break;
+	}
+
+	for (int i = 0; i < 16; i++) {
+		for (int j = 0; j < 15; j++) {
+			if ((line[i].floorPosition[j] == characterCoord) && line[i].isTree[j] != 0 && line[i].floorType == 0) {
+				return false;
+			}
+		}
+	}
+
+	return true;
+}

@@ -8,6 +8,7 @@ extern GLuint shaderProgramID;
 extern Line line[16];
 extern int numOfLines;
 extern Car car[100];
+extern float characterX;
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -108,7 +109,7 @@ void create_new_line(int i) {
 		line[i].isTree[k] = treeType[tree][k];
 	}
 	for (int j = 0; j < 15; j++) { // 타일 위치 지정
-		line[i].floorPosition[j] = glm::vec3(j - 7.0, 0.0, line[i].floorPosition[j].z - 16);
+		line[i].floorPosition[j] = glm::vec3(j - 7.0 + characterX, 0.0, line[i].floorPosition[j].z - 16);
 	}
 	line[i].direction = urdD(gen);
 	line[i].start_time = std::time(nullptr);
