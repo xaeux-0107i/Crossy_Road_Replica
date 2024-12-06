@@ -8,4 +8,4 @@
 #include <gl/glm/gtc/matrix_transform.hpp>
 
 void duck(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos, float sc, float degree, float height);
-void leg(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos);
+void wing(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos, float sc, float degree, float height, float wingAngle);
