@@ -31,6 +31,7 @@ GLvoid INITBuffer();
 GLvoid DuckBuffer();
 int isCollide(char key);
 int isCollideWithCar(glm::vec3 pos);
+void update_wing();
 
 std::vector<glm::vec3> readOBJ(std::string filename);
 GLuint vertexCount[3];
@@ -47,9 +48,9 @@ int msecs = 30;
 GLuint VAO[3];
 GLuint VBO[3];
 
-GLuint Duck_VAO[4];
-GLuint Duck_VBO[4];
-GLuint Duck_vertexCount[4];
+GLuint Duck_VAO[6];
+GLuint Duck_VBO[6];
+GLuint Duck_vertexCount[6];
 
 float cameraX = 0.0f;
 float cameraY = 10.0f;
@@ -63,6 +64,9 @@ float characterX = 0.0f;
 float duckDegree = 180.0;
 float duckHeight = 0.26;
 bool isAlive = true;
+
+float rotationSpeed = 2.0f;
+float wingAngle = 0.0f;
 
 glm::mat4 view = glm::lookAt(
 	glm::vec3(cameraX, cameraY, cameraZ), // 카메라 위치
@@ -185,8 +189,8 @@ std::vector<glm::vec3> readOBJ(std::string filename)
 
 GLvoid DuckBuffer()
 {
-	glGenVertexArrays(4, Duck_VAO); // VAO 생성
-	glGenBuffers(4, Duck_VBO);      // VBO 생성
+	glGenVertexArrays(6, Duck_VAO); // VAO 생성
+	glGenBuffers(6, Duck_VBO);      // VBO 생성
 
 	glBindVertexArray(Duck_VAO[0]);     // VAO 바인딩
 	glBindBuffer(GL_ARRAY_BUFFER, Duck_VBO[0]); // VBO 바인딩
@@ -234,6 +238,32 @@ GLvoid DuckBuffer()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * Duck_vertexData.size() * 3, Duck_vertexData.data(), GL_STATIC_DRAW);
 
 	Duck_vertexCount[3] = Duck_vertexData.size() / 3;
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(sizeof(float) * 6));
+	glEnableVertexAttribArray(1);
+
+	glBindVertexArray(Duck_VAO[4]);     // VAO 바인딩
+	glBindBuffer(GL_ARRAY_BUFFER, Duck_VBO[4]); // VBO 바인딩
+
+	Duck_vertexData = readOBJ("right_wing.obj");
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * Duck_vertexData.size() * 3, Duck_vertexData.data(), GL_STATIC_DRAW);
+
+	Duck_vertexCount[4] = Duck_vertexData.size() / 3;
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(sizeof(float) * 6));
+	glEnableVertexAttribArray(1);
+
+	glBindVertexArray(Duck_VAO[5]);     // VAO 바인딩
+	glBindBuffer(GL_ARRAY_BUFFER, Duck_VBO[5]); // VBO 바인딩
+
+	Duck_vertexData = readOBJ("left_wing.obj");
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * Duck_vertexData.size() * 3, Duck_vertexData.data(), GL_STATIC_DRAW);
+
+	Duck_vertexCount[5] = Duck_vertexData.size() / 3;
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
 	glEnableVertexAttribArray(0);
@@ -497,7 +527,11 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 
 	//
 	//오리
-	if(isAlive) duck(modelLoc, objectColor, glm::vec3(0, 0, 0), 30.0f, duckDegree, duckHeight);
+	if (isAlive) {
+		duck(modelLoc, objectColor, glm::vec3(0, 0, 0), 30.0f, duckDegree, duckHeight);
+		wing(modelLoc, objectColor, glm::vec3(0, 0, 0), 30.0f, duckDegree, duckHeight, wingAngle);
+	}
+
 
 	//타일 그리기
 	for (int i = 0; i < numOfLines; i++) {
@@ -544,6 +578,8 @@ void TimerFunction(int v) {
 			if (isCollideWithCar(car[i].pos)) isAlive = false;
 		}
 	}
+
+	update_wing();
 	glutPostRedisplay(); // 화면 재출력
 	glutTimerFunc(msecs, TimerFunction, 1); // 타이머 함수 설정
 }
@@ -584,4 +620,23 @@ int isCollideWithCar(glm::vec3 pos) {
 	if (pos.z - 0.2 > 0 + 0.3) return false; // A의 아래쪽이 B의 위쪽을 넘음
 	if (pos.z + 0.2 / 2 < 0 - 0.3) return false; // A의 위쪽이 B의 아래쪽을 넘음
 	return true; // 충돌
+}
+
+bool isIncreasing = true; // 증가 중인지 여부를 추적하는 플래그
+
+void update_wing() {
+	if (isIncreasing) {
+		wingAngle += rotationSpeed;
+		if (wingAngle >= 45.0f) {
+			wingAngle = 45.0f; // 최대 각도를 제한
+			isIncreasing = false; // 감소로 전환
+		}
+	}
+	else {
+		wingAngle -= rotationSpeed;
+		if (wingAngle <= 0.0f) {
+			wingAngle = 0.0f; // 최소 각도를 제한
+			isIncreasing = true; // 증가로 전환
+		}
+	}
 }
