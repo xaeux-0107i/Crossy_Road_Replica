@@ -32,6 +32,7 @@ GLvoid DuckBuffer();
 int isCollide(char key);
 int isCollideWithCar(glm::vec3 pos);
 void update_wing();
+void fly_wing();
 
 std::vector<glm::vec3> readOBJ(std::string filename);
 GLuint vertexCount[3];
@@ -600,6 +601,7 @@ void TimerFunction(int v) {
 	if (isJumping) {
 		duckHeight += jumpSpeed;   
 		jumpSpeed += gravity;       
+		fly_wing();
 
 		// 바닥에 도달
 		if (duckHeight <= 0.26f) {
@@ -670,6 +672,24 @@ void update_wing() {
 		if (wingAngle <= 0.0f) {
 			wingAngle = 0.0f; // 최소 각도를 제한
 			isIncreasing = true; // 증가로 전환
+		}
+	}
+}
+
+
+void fly_wing() {
+	if (isIncreasing) {
+		wingAngle += rotationSpeed*10;
+		if (wingAngle >= 45.0f) {
+			wingAngle = 45.0f; 
+			isIncreasing = false; 
+		}
+	}
+	else {
+		wingAngle -= rotationSpeed*10;
+		if (wingAngle <= 0.0f) {
+			wingAngle = 0.0f; 
+			isIncreasing = true; 
 		}
 	}
 }
