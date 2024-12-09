@@ -68,6 +68,11 @@ bool isAlive = true;
 float rotationSpeed = 2.0f;
 float wingAngle = 0.0f;
 
+//점프
+bool isJumping = false; // 점프 상태
+float jumpSpeed = 0.2f; // 점프 속도
+float gravity = -0.01f; // 중력
+
 glm::mat4 view = glm::lookAt(
 	glm::vec3(cameraX, cameraY, cameraZ), // 카메라 위치
 	glm::vec3(0.0f, 0.0f, 0.0f), // 카메라가 바라보는 대상
@@ -399,6 +404,19 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		}
 		duckDegree = 270.0;
 		break;
+
+	case ' ':  //이건 스페이스바
+		//std::cout << "Spacebar" << std::endl;
+		if (!isJumping) {
+			isJumping = true;
+			jumpSpeed = 0.2f; 
+		}
+		break;
+
+	case 27: // ESC 키
+		std::cout << "Escape" << std::endl;
+		exit(0); // 프로그램 종료
+		break;
 	}
 	if (key != 'q') {
 		glutPostRedisplay(); // 화면 재출력
@@ -579,6 +597,18 @@ void TimerFunction(int v) {
 		}
 	}
 
+	if (isJumping) {
+		duckHeight += jumpSpeed;   
+		jumpSpeed += gravity;       
+
+		// 바닥에 도달
+		if (duckHeight <= 0.26f) {
+			duckHeight = 0.26f;     
+			isJumping = false;      
+			jumpSpeed = 0.0f;      
+		}
+	}
+
 	update_wing();
 	glutPostRedisplay(); // 화면 재출력
 	glutTimerFunc(msecs, TimerFunction, 1); // 타이머 함수 설정
@@ -599,7 +629,10 @@ int isCollide(char key) {
 	case 's':
 		characterCoord = glm::vec3(0.0, 0.0, 1.0);
 		break;
+
+
 	}
+
 
 	for (int i = 0; i < 16; i++) {
 		for (int j = 0; j < 15; j++) {
