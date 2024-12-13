@@ -9,6 +9,7 @@ uniform vec3 lightPos;   // 광원 위치
 uniform vec3 viewPos;    // 카메라 위치
 uniform vec3 lightColor; // 광원 색상
 uniform vec3 objectColor; // 물체 색상
+uniform float light_strength;
 
 void main() {
     // Ambient
@@ -28,6 +29,6 @@ void main() {
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 128);
     vec3 specular = specularStrength * spec * lightColor;
 
-    vec3 result = (ambient + diffuse + specular) * objectColor;
+    vec3 result = (ambient + diffuse + specular) * objectColor * light_strength;
     fragColor = vec4(result, 1.0);
 }

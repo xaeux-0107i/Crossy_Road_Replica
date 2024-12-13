@@ -46,8 +46,9 @@ GLchar* vertexSource, * fragmentSource;
 
 int msecs = 30;
 int camera_mode = 0;
-float sun_angle = 0.0f;
+float sun_angle = 90.0f;
 float sun_time = 30.0f;
+float light_strength = 1.0f;
 
 //charcter
 GLuint VAO[3];
@@ -584,12 +585,21 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 		//조명 관련
 		lightX = 10.0f * glm::cos(sun_angle);  // 동쪽-서쪽으로 이동
 		lightY = 10.0f * glm::sin(sun_angle);  
-		lightZ = 0.0f;                         
+		lightZ = 0.0f;   
+
+		 //light_strength 설정
+		if (sun_angle >= 0.0f && sun_angle <= glm::pi<float>()) {
+			light_strength = 1.0f; // 낮: 조명 활성화
+		}
+		else {
+			light_strength = 0.5f; // 밤: 조명 비활성화
+		}
+
 
 		// 조명 관련 uniform 설정
 		glm::vec3 lightPos(lightX, lightY, lightZ);
 		glm::vec3 viewPos(cameraX, cameraY, cameraZ);
-		glm::vec3 lightColor(1.0f, 1.0f, 1.0f); // 흰색 광원
+		glm::vec3 lightColor(1.0f, 1.0f, 0.8f); // 흰색 광원
 		glm::vec3 objectColor(1.0f, 1.0f, 1.0f); // 물체 색상
 
 		glm::mat4 model = glm::mat4(1.0f);
@@ -597,6 +607,7 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 		glUniform3fv(glGetUniformLocation(shaderProgramID, "viewPos"), 1, &viewPos[0]);
 		glUniform3fv(glGetUniformLocation(shaderProgramID, "lightColor"), 1, &lightColor[0]);
 		glUniform3fv(glGetUniformLocation(shaderProgramID, "objectColor"), 1, &objectColor[0]);
+		glUniform1f(glGetUniformLocation(shaderProgramID, "light_strength"), light_strength);
 
 		// 행렬을 셰이더로 전달
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
