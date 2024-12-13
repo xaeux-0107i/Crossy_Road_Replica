@@ -33,6 +33,7 @@ int isCollide(char key);
 int isCollideWithCar(glm::vec3 pos);
 void update_wing();
 void fly_wing();
+void change_camera_direction(float duckDegree);
 
 std::vector<glm::vec3> readOBJ(std::string filename);
 GLuint vertexCount[3];
@@ -44,6 +45,7 @@ GLuint fragmentShader; // 프래그먼트 세이더
 GLchar* vertexSource, * fragmentSource; 
 
 int msecs = 30;
+int camera_mode = 0;
 
 //charcter
 GLuint VAO[3];
@@ -56,6 +58,10 @@ GLuint Duck_vertexCount[6];
 float cameraX = 0.0f;
 float cameraY = 10.0f;
 float cameraZ = 5.0f;
+
+float camera_lookat_X = 0.0f;
+float camera_lookat_y = 0.0f;
+float camera_lookat_z = 0.0f;
 
 float lightX = 0.0f;
 float lightZ = 0.0f;
@@ -76,7 +82,7 @@ float gravity = -0.01f; // 중력
 
 glm::mat4 view = glm::lookAt(
 	glm::vec3(cameraX, cameraY, cameraZ), // 카메라 위치
-	glm::vec3(0.0f, 0.0f, 0.0f), // 카메라가 바라보는 대상
+	glm::vec3(camera_lookat_X, camera_lookat_y, camera_lookat_z), // 카메라가 바라보는 대상
 	glm::vec3(0.0f, 1.0f, 0.0f)  // 카메라의 업 벡터
 );
 
@@ -336,6 +342,7 @@ void main(int argc, char** argv)
 GLvoid Keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 'w':
+
 		if (isCollide(key) && isAlive) {
 			for (int i = 0; i < numOfLines; i++) { // 맵 이동
 				for (int j = 0; j < 15; j++) {
@@ -353,6 +360,7 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 			}
 		}
 		duckDegree = 180.0;
+		change_camera_direction(duckDegree);
 		break;
 	case 's':
 		if (isCollide(key) && isAlive) {
@@ -369,6 +377,7 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 			}
 		}
 		duckDegree = 0.0;
+		change_camera_direction(duckDegree);
 		break;
 	case 'd':
 		if (isCollide(key) && characterX != -7.0 && isAlive) {
@@ -387,6 +396,7 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 			characterX -= 1.0;
 		}
 		duckDegree = 90.0;
+		change_camera_direction(duckDegree);
 		break;
 	case 'a':
 		if (isCollide(key) && characterX != 7.0 && isAlive) {
@@ -404,6 +414,7 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 			characterX += 1.0;
 		}
 		duckDegree = 270.0;
+		change_camera_direction(duckDegree);
 		break;
 
 	case ' ':  //이건 스페이스바
@@ -418,7 +429,25 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		std::cout << "Escape" << std::endl;
 		exit(0); // 프로그램 종료
 		break;
+
+	case 'c':
+		camera_mode++;
+		if (camera_mode % 2 == 1) {
+			change_camera_direction(duckDegree);
+
+			cameraY = duckHeight+0.5f;
+
+			camera_lookat_y = duckHeight + 0.5f;
+
+		}
+		else {
+			cameraX = 0.0f;
+			cameraY = 10.0f;
+			cameraZ = 5.0f;
+		}
+
 	}
+
 	if (key != 'q') {
 		glutPostRedisplay(); // 화면 재출력
 	}
@@ -508,12 +537,20 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 	//glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);															 // 깊이 테스트 활성화
 
-
-	view = glm::lookAt(
-		glm::vec3(cameraX, cameraY, cameraZ), // 카메라 위치
-		glm::vec3(0.0f, 0.0f, 0.0f), // 카메라가 바라보는 대상
-		glm::vec3(0.0f, 1.0f, 0.0f)  // 카메라의 업 벡터
-	);
+	if (camera_mode % 2 == 1) {
+		view = glm::lookAt(
+			glm::vec3(cameraX, cameraY, cameraZ), // 카메라 위치
+			glm::vec3(camera_lookat_X, camera_lookat_y, camera_lookat_z), // 카메라가 바라보는 대상
+			glm::vec3(0.0f, 1.0f, 0.0f)  // 카메라의 업 벡터
+		);
+	}
+	else {
+		view = glm::lookAt(
+			glm::vec3(0.0f, 10.0f, 5.0f), // 카메라 위치
+			glm::vec3(0.0f, 0.0f, 0.0f), // 카메라가 바라보는 대상
+			glm::vec3(0.0f, 1.0f, 0.0f)  // 카메라의 업 벡터
+		);
+	}
 
 	// 셰이더 내 유니폼 변수 위치 찾기
 	GLint viewLoc = glGetUniformLocation(shaderProgramID, "view");
@@ -632,7 +669,6 @@ int isCollide(char key) {
 		characterCoord = glm::vec3(0.0, 0.0, 1.0);
 		break;
 
-
 	}
 
 
@@ -692,4 +728,12 @@ void fly_wing() {
 			isIncreasing = true; 
 		}
 	}
+}
+
+void change_camera_direction(float duckDegree) {
+	camera_lookat_X = sin(glm::radians(duckDegree));
+	camera_lookat_z = cos(glm::radians(duckDegree));
+
+	cameraX = 0.5 * sin(glm::radians(duckDegree));
+	cameraZ = 0.5 * cos(glm::radians(duckDegree));
 }
