@@ -445,7 +445,7 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 			cameraY = 10.0f;
 			cameraZ = 5.0f;
 		}
-
+		break;
 	}
 
 	if (key != 'q') {
@@ -536,86 +536,99 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 	glClearColor(rColor, gColor, bColor, 1.0f);
 	//glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);															 // 깊이 테스트 활성화
+	for (int i = 0; i < 2; i++) {
+		if (camera_mode % 2 == 1) {
+			if (i == 0) {
+				glViewport(0, 0, 800, 600);
+				view = glm::lookAt(
+					glm::vec3(cameraX, cameraY, cameraZ), // 카메라 위치
+					glm::vec3(camera_lookat_X, camera_lookat_y, camera_lookat_z), // 카메라가 바라보는 대상
+					glm::vec3(0.0f, 1.0f, 0.0f)  // 카메라의 업 벡터
+				);
+			}
+			else if (i == 1) {
+				glViewport(0, 400, 200, 200);
+				view = glm::lookAt(
+					glm::vec3(0.0f, 10.0f, 5.0f), // 카메라 위치
+					glm::vec3(0.0f, 0.0f, 0.0f), // 카메라가 바라보는 대상
+					glm::vec3(0.0f, 1.0f, 0.0f)  // 카메라의 업 벡터
+				);
 
-	if (camera_mode % 2 == 1) {
-		view = glm::lookAt(
-			glm::vec3(cameraX, cameraY, cameraZ), // 카메라 위치
-			glm::vec3(camera_lookat_X, camera_lookat_y, camera_lookat_z), // 카메라가 바라보는 대상
-			glm::vec3(0.0f, 1.0f, 0.0f)  // 카메라의 업 벡터
-		);
-	}
-	else {
-		view = glm::lookAt(
-			glm::vec3(0.0f, 10.0f, 5.0f), // 카메라 위치
-			glm::vec3(0.0f, 0.0f, 0.0f), // 카메라가 바라보는 대상
-			glm::vec3(0.0f, 1.0f, 0.0f)  // 카메라의 업 벡터
-		);
-	}
+			}
+		}
+		else {
+			glViewport(0, 0, 800, 600);
+			view = glm::lookAt(
+				glm::vec3(0.0f, 10.0f, 5.0f), // 카메라 위치
+				glm::vec3(0.0f, 0.0f, 0.0f), // 카메라가 바라보는 대상
+				glm::vec3(0.0f, 1.0f, 0.0f)  // 카메라의 업 벡터
+			);
+		}
 
-	// 셰이더 내 유니폼 변수 위치 찾기
-	GLint viewLoc = glGetUniformLocation(shaderProgramID, "view");
-	GLint projLoc = glGetUniformLocation(shaderProgramID, "projection");
-	GLint modelLoc = glGetUniformLocation(shaderProgramID, "model");
+		// 셰이더 내 유니폼 변수 위치 찾기
+		GLint viewLoc = glGetUniformLocation(shaderProgramID, "view");
+		GLint projLoc = glGetUniformLocation(shaderProgramID, "projection");
+		GLint modelLoc = glGetUniformLocation(shaderProgramID, "model");
 
-	// 조명 관련 uniform 설정
-	glm::vec3 lightPos(lightX, lightY, lightZ);
-	glm::vec3 viewPos(cameraX, cameraY, cameraZ);
-	glm::vec3 lightColor(1.0f, 1.0f, 1.0f); // 흰색 광원
-	glm::vec3 objectColor(1.0f, 1.0f, 1.0f); // 물체 색상
+		// 조명 관련 uniform 설정
+		glm::vec3 lightPos(lightX, lightY, lightZ);
+		glm::vec3 viewPos(cameraX, cameraY, cameraZ);
+		glm::vec3 lightColor(1.0f, 1.0f, 1.0f); // 흰색 광원
+		glm::vec3 objectColor(1.0f, 1.0f, 1.0f); // 물체 색상
 
-	glm::mat4 model = glm::mat4(1.0f);
-	glUniform3fv(glGetUniformLocation(shaderProgramID, "lightPos"), 1, &lightPos[0]);
-	glUniform3fv(glGetUniformLocation(shaderProgramID, "viewPos"), 1, &viewPos[0]);
-	glUniform3fv(glGetUniformLocation(shaderProgramID, "lightColor"), 1, &lightColor[0]);
-	glUniform3fv(glGetUniformLocation(shaderProgramID, "objectColor"), 1, &objectColor[0]);
+		glm::mat4 model = glm::mat4(1.0f);
+		glUniform3fv(glGetUniformLocation(shaderProgramID, "lightPos"), 1, &lightPos[0]);
+		glUniform3fv(glGetUniformLocation(shaderProgramID, "viewPos"), 1, &viewPos[0]);
+		glUniform3fv(glGetUniformLocation(shaderProgramID, "lightColor"), 1, &lightColor[0]);
+		glUniform3fv(glGetUniformLocation(shaderProgramID, "objectColor"), 1, &objectColor[0]);
 
-	// 행렬을 셰이더로 전달
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
-	glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
+		// 행렬을 셰이더로 전달
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
 
-	//model = glm::mat4(1.0f);
-	//model = glm::rotate(model, glm::radians(15.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // x축으로 10도 회전
-	//model = glm::rotate(model, glm::radians(15.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // y축으로 10도 회전
+		//model = glm::mat4(1.0f);
+		//model = glm::rotate(model, glm::radians(15.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // x축으로 10도 회전
+		//model = glm::rotate(model, glm::radians(15.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // y축으로 10도 회전
 
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &model[0][0]);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &model[0][0]);
 
-	glUseProgram(shaderProgramID);
+		glUseProgram(shaderProgramID);
 
-	//
-	//오리
-	if (isAlive) {
-		duck(modelLoc, objectColor, glm::vec3(0, 0, 0), 30.0f, duckDegree, duckHeight);
-		wing(modelLoc, objectColor, glm::vec3(0, 0, 0), 30.0f, duckDegree, duckHeight, wingAngle);
-	}
+		//
+		//오리
+		if (isAlive) {
+			duck(modelLoc, objectColor, glm::vec3(0, 0, 0), 30.0f, duckDegree, duckHeight);
+			wing(modelLoc, objectColor, glm::vec3(0, 0, 0), 30.0f, duckDegree, duckHeight, wingAngle);
+		}
 
 
-	//타일 그리기
-	for (int i = 0; i < numOfLines; i++) {
-		for (int j = 0; j < 15; j++) {
-			switch (line[i].floorType) {
-			case 0: // 풀밭
-				draw_grass(modelLoc, objectColor, line[i].floorPosition[j]);
-				if (line[i].isTree[j] == 1) {
-					draw_tree(modelLoc, objectColor, line[i].floorPosition[j]);
+		//타일 그리기
+		for (int i = 0; i < numOfLines; i++) {
+			for (int j = 0; j < 15; j++) {
+				switch (line[i].floorType) {
+				case 0: // 풀밭
+					draw_grass(modelLoc, objectColor, line[i].floorPosition[j]);
+					if (line[i].isTree[j] == 1) {
+						draw_tree(modelLoc, objectColor, line[i].floorPosition[j]);
+					}
+					if (line[i].isTree[j] == 2) {
+						draw_stone(modelLoc, objectColor, line[i].floorPosition[j]);
+					}
+					break;
+				case 1: // 도로
+					draw_road(modelLoc, objectColor, line[i].floorPosition[j]);
+					break;
 				}
-				if (line[i].isTree[j] == 2) {
-					draw_stone(modelLoc, objectColor, line[i].floorPosition[j]);
-				}
-				break;
-			case 1: // 도로
-				draw_road(modelLoc, objectColor, line[i].floorPosition[j]);
-				break;
+			}
+		}
+
+		// 자동차 그리기
+		for (int i = 0; i < 100; i++) {
+			if (car[i].active) {
+				car[i].drawCar(modelLoc, objectColor);
 			}
 		}
 	}
-
-	// 자동차 그리기
-	for (int i = 0; i < 100; i++) {
-		if (car[i].active) {
-			car[i].drawCar(modelLoc, objectColor);
-		}
-	}
-
 	glutSwapBuffers(); // 화면에 출력하기
 }
 

@@ -177,7 +177,7 @@ void Car::updateCar() {
 	switch (direction) {
 	case 0: // 왼쪽으로 이동
 		pos.x += speed;
-		if (pos.x >= line[lineNum].floorPosition[8].x) {
+		if (pos.x >= line[lineNum].floorPosition[14].x) {
 			active = false;
 		}
 		break;
