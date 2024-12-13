@@ -46,6 +46,8 @@ GLchar* vertexSource, * fragmentSource;
 
 int msecs = 30;
 int camera_mode = 0;
+float sun_angle = 0.0f;
+float sun_time = 30.0f;
 
 //charcter
 GLuint VAO[3];
@@ -65,7 +67,7 @@ float camera_lookat_z = 0.0f;
 
 float lightX = 0.0f;
 float lightZ = 0.0f;
-float lightY = 10.0f;
+float lightY = 10.0f ;
 
 float characterX = 0.0f;
 float duckDegree = 180.0;
@@ -534,9 +536,9 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 	//bColor = 0.396;
 	rColor = gColor = bColor = 1.0f;
 	glClearColor(rColor, gColor, bColor, 1.0f);
-	//glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);															 // 깊이 테스트 활성화
-	for (int i = 0; i < 2; i++) {
+
+	for (int i = 0; i < 2; i++) {	//뷰포트 포문
 		if (camera_mode % 2 == 1) {
 			if (i == 0) {
 				glViewport(0, 0, 800, 600);
@@ -569,6 +571,12 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 		GLint viewLoc = glGetUniformLocation(shaderProgramID, "view");
 		GLint projLoc = glGetUniformLocation(shaderProgramID, "projection");
 		GLint modelLoc = glGetUniformLocation(shaderProgramID, "model");
+
+		
+		//조명 관련
+		lightX = 10.0f * glm::cos(sun_angle);  // 동쪽-서쪽으로 이동
+		lightY = 10.0f * glm::sin(sun_angle);  
+		lightZ = 0.0f;                         
 
 		// 조명 관련 uniform 설정
 		glm::vec3 lightPos(lightX, lightY, lightZ);
@@ -659,6 +667,12 @@ void TimerFunction(int v) {
 			isJumping = false;      
 			jumpSpeed = 0.0f;      
 		}
+	}
+
+	// 태양 각도
+	sun_angle += glm::radians(sun_time / 360.0f);
+	if (sun_angle >= glm::two_pi<float>()) {
+		sun_angle -= glm::two_pi<float>(); 
 	}
 
 	update_wing();
