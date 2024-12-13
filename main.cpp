@@ -448,7 +448,15 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 			cameraZ = 5.0f;
 		}
 		break;
-	}
+
+	case '-':
+		sun_time = 30.0f;
+		break;
+	case '=':
+		sun_time = 300.0f;
+		break;
+
+	}//key 스위치문
 
 	if (key != 'q') {
 		glutPostRedisplay(); // 화면 재출력
