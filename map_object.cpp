@@ -118,7 +118,7 @@ void draw_cloud(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos) {
 	glBindVertexArray(0);
 };
 void draw_cloud2(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos) {
-	objectColor = glm::vec3(0.4, 0.4, 0.4); // 회색
+	objectColor = glm::vec3(0.7, 0.7, 0.7); // 회색
 	glUniform3fv(glGetUniformLocation(shaderProgramID, "objectColor"), 1, &objectColor[0]);
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::mat4(1.0f);

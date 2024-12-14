@@ -449,9 +449,9 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 					car[i].pos.z += 1;
 				}
 			}
+			duckDegree = cameraDegree = 180.0;
+			change_camera_direction(cameraDegree);
 		}
-		duckDegree = cameraDegree = 180.0;
-		change_camera_direction(cameraDegree);
 		break;
 	case 's':
 		if (isCollide(key) && isAlive) {
@@ -466,9 +466,9 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 					car[i].pos.z -= 1;
 				}
 			}
+			duckDegree = cameraDegree = 0.0;
+			change_camera_direction(cameraDegree);
 		}
-		duckDegree = cameraDegree = 0.0;
-		change_camera_direction(cameraDegree);
 		break;
 	case 'd':
 		if (isCollide(key) && characterX != -7.0 && isAlive) {
@@ -485,9 +485,9 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 			}
 
 			characterX -= 1.0;
+			duckDegree = cameraDegree = 90.0;
+			change_camera_direction(cameraDegree);
 		}
-		duckDegree = cameraDegree = 90.0;
-		change_camera_direction(cameraDegree);
 		break;
 	case 'a':
 		if (isCollide(key) && characterX != 7.0 && isAlive) {
@@ -503,30 +503,31 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 				}
 			}
 			characterX += 1.0;
+			duckDegree = cameraDegree = 270.0;
+			change_camera_direction(cameraDegree);
 		}
-		duckDegree = cameraDegree = 270.0;
-		change_camera_direction(cameraDegree);
 		break;
 
 	case ' ':  //이건 스페이스바
 	{
-		//std::cout << "Spacebar" << std::endl;
-		if (!isJumping) {
-			isJumping = true;
-			jumpSpeed = 0.2f;
-		}
-
-		int n = 0;
-		for (int i = 0; i < 16; i++) {
-			if (line[i].cloudNum != 0) {
-				if (isCollideWithCloud(line[i].floorPosition[line[i].cloudNum])) n = 1;
+		if (isAlive) {
+			if (!isJumping) {
+				isJumping = true;
+				jumpSpeed = 0.2f;
 			}
-		}
 
-		if (n == 1) {
-			isJumping = true;
-			jumpSpeed = 0.2f;
-			jump2 = true;
+			int n = 0;
+			for (int i = 0; i < 16; i++) {
+				if (line[i].cloudNum != 0) {
+					if (isCollideWithCloud(line[i].floorPosition[line[i].cloudNum])) n = 1;
+				}
+			}
+
+			if (n == 1) {
+				isJumping = true;
+				jumpSpeed = 0.2f;
+				jump2 = true;
+			}
 		}
 	}
 		break;
@@ -881,7 +882,8 @@ void TimerFunction(int v) {
 
 	// 태양 각도 갱신 (0도 ~ 180도에서 천천히 왕복)
 	if (sun_move) {
-		sun_angle = glm::radians(90.0f) * (1.0f + sin(glm::radians(sun_time)));
+		//sun_angle = glm::radians(90.0f) * (1.0f + sin(glm::radians(sun_time)));
+		sun_angle = glm::radians(30.0f) + glm::radians(120.0f) * (0.5f * (1.0f + sin(glm::radians(sun_time))));
 		sun_time += 0.1f; // 시간의 증가 속도를 조정하여 천천히 움직이도록 설정
 	}
 
@@ -967,7 +969,7 @@ int isCollideWithCloud(glm::vec3 pos) {
 	if (pos.x + 0.7 < 0 - 0.3) return false; // A의 오른쪽이 B의 왼쪽을 넘음
 	if (pos.z - 0.7 > 0 + 0.3) return false; // A의 아래쪽이 B의 위쪽을 넘음
 	if (pos.z + 0.7 / 2 < 0 - 0.3) return false; // A의 위쪽이 B의 아래쪽을 넘음
-	if (duckHeight > 1.5 - 0.13 && duckHeight < 1.5 + 0.13) return false; // y축 고려
+	if (duckHeight < 1.5 - 0.13 || duckHeight > 1.5 + 0.13) return false; // y축 고려
 	return true; // 충돌
 }
 
