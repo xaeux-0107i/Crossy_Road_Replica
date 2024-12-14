@@ -80,7 +80,10 @@ float characterX = 0.0f;
 float duckDegree = 180.0;
 float cameraDegree = 0;
 float duckHeight = 0.26;
+float dieduckHeight = 0.05;
 float characterScale = 30.0f;
+float characterYScale = 30.0f;
+float diecharacterYScale = 1.0f;
 bool isAlive = true;
 bool isDragging = false;
 
@@ -92,6 +95,7 @@ bool isJumping = false; // 점프 상태
 float jumpSpeed = 0.2f; // 점프 속도
 float gravity = -0.01f; // 중력
 bool jump2 = false; // 구름 위에서 한 번 더 점프
+
 
 glm::mat4 view = glm::lookAt(
 	glm::vec3(cameraX, cameraY, cameraZ), // 카메라 위치
@@ -513,6 +517,8 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 	
 	case 'p':
 		sun_time = 0.0f;
+		sun_angle = 90.0f;
+		break;
 
 	}//key 스위치문
 
@@ -736,9 +742,14 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 		if (characterMode == 1) isBlending = 1;
 		glUniform1i(glGetUniformLocation(shaderProgramID, "isBlending"), isBlending);
 		//오리
+
 		if (isAlive) {
-			duck(modelLoc, objectColor, glm::vec3(0, 0, 0), characterScale, duckDegree, duckHeight);
-			wing(modelLoc, objectColor, glm::vec3(0, 0, 0), characterScale, duckDegree, duckHeight, wingAngle);
+			duck(modelLoc, objectColor, glm::vec3(0, 0, 0), characterScale, duckDegree, duckHeight, characterYScale);
+			wing(modelLoc, objectColor, glm::vec3(0, 0, 0), characterScale, duckDegree, duckHeight, wingAngle, characterYScale);
+		}
+		else {
+			duck(modelLoc, objectColor, glm::vec3(0, 0, 0), characterScale, duckDegree, dieduckHeight, diecharacterYScale);
+			wing(modelLoc, objectColor, glm::vec3(0, 0, 0), characterScale, duckDegree, dieduckHeight, wingAngle, diecharacterYScale);
 		}
 
 		isBlending = 2;
