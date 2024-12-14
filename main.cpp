@@ -519,6 +519,9 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		sun_time = 0.0f;
 		sun_angle = 90.0f;
 		break;
+	case 'r':
+		isAlive = true;
+		break;
 
 	}//key 스위치문
 
