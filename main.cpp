@@ -51,6 +51,7 @@ int msecs = 30;
 int camera_mode = 0;
 float sun_angle = 90.0f;
 float sun_time = 30.0f;
+bool sun_move = true;
 float light_strength = 1.0f;
 float prevMouseX = 0.0;
 int characterMode = 0;
@@ -552,17 +553,19 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		}
 		break;
 
-	case '-':
-		sun_time = 30.0f;
-		break;
-	case '=':
-		sun_time = 300.0f;
-		break;
-	
+	//case '-':
+	//	sun_time = 30.0f;
+	//	break;
+	//case '=':
+	//	sun_time = 300.0f;
+	//	break;
+	//
 	case 'p':
+		sun_move = !sun_move;
 		sun_time = 0.0f;
 		sun_angle = 90.0f;
 		break;
+
 	case 'r':
 		isAlive = true;
 		break;
@@ -719,13 +722,13 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 		lightY = 10.0f * glm::sin(sun_angle);  
 		lightZ = 0.0f;   
 
-		 //light_strength 설정
-		if (sun_angle >= 0.0f && sun_angle <= glm::pi<float>()) {
-			light_strength = 1.0f; // 낮: 조명 활성화
-		}
-		else {
-			light_strength = 0.5f; // 밤: 조명 비활성화
-		}
+		// //light_strength 설정
+		//if (sun_angle >= 0.0f && sun_angle <= glm::pi<float>()) {
+		//	light_strength = 1.0f; // 낮: 조명 활성화
+		//}
+		//else {
+		//	light_strength = 0.5f; // 밤: 조명 비활성화
+		//}
 
 
 		// 조명 관련 uniform 설정
@@ -868,13 +871,20 @@ void TimerFunction(int v) {
 		}
 	}
 
-	// 태양 각도
-	sun_angle += glm::radians(sun_time / 360.0f);
-	if (sun_angle >= glm::two_pi<float>()) {
-		sun_angle -= glm::two_pi<float>(); 
+
+	//// 태양 각도
+	//sun_angle += glm::radians(sun_time / 360.0f);
+	//if (sun_angle >= glm::two_pi<float>()) {
+	//	sun_angle -= glm::two_pi<float>(); 
+	//}
+
+
+	// 태양 각도 갱신 (0도 ~ 180도에서 천천히 왕복)
+	if (sun_move) {
+		sun_angle = glm::radians(90.0f) * (1.0f + sin(glm::radians(sun_time)));
+		sun_time += 0.1f; // 시간의 증가 속도를 조정하여 천천히 움직이도록 설정
 	}
 
-	//logoAngle = -10.0f * glm::sin(glm::radians(logoSpeed)) - 10.0f; 
 	if (logoAngle <= -70.0f || logoAngle >= -30.0f) {
 		logoSpeed = -logoSpeed;  // 방향 반전
 	}
