@@ -31,6 +31,7 @@ void TimerFunction(int v);
 void TimerFunction2(int v);
 GLvoid INITBuffer();
 GLvoid DuckBuffer();
+GLvoid LogoBuffer();
 int isCollide(char key);
 int isCollideWithCar(glm::vec3 pos);
 int isCollideWithCloud(glm::vec3 pos);
@@ -96,6 +97,11 @@ float jumpSpeed = 0.2f; // 점프 속도
 float gravity = -0.01f; // 중력
 bool jump2 = false; // 구름 위에서 한 번 더 점프
 
+bool startmode = true;
+bool rogoRotating = true;
+float logoAngle = -30.0f;
+float logoSpeed = 1.0f;     
+
 
 glm::mat4 view = glm::lookAt(
 	glm::vec3(cameraX, cameraY, cameraZ), // 카메라 위치
@@ -112,6 +118,10 @@ glm::mat4 projection = glm::perspective(
 // 맵
 Line line[16];
 int numOfLines = 16;
+
+GLuint logo_VAO[6];
+GLuint logo_VBO[6];
+GLuint logo_vertexCount[6];
 
 // 자동차
 Car car[100];
@@ -353,6 +363,39 @@ GLvoid INITBuffer()
 	glBindVertexArray(0);
 }
 
+GLvoid LogoBuffer() {
+	glGenVertexArrays(3, logo_VAO); // VAO 생성
+	glGenBuffers(3, logo_VBO);      // VBO 생성
+
+	glBindVertexArray(logo_VAO[0]);     // VAO 바인딩
+	glBindBuffer(GL_ARRAY_BUFFER, logo_VBO[0]); // VBO 바인딩
+
+	std::vector<glm::vec3>logo_vertexData = readOBJ("logo.obj");
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * logo_vertexData.size() * 3, logo_vertexData.data(), GL_STATIC_DRAW);
+
+	logo_vertexCount[0] = logo_vertexData.size() / 3;
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(sizeof(float) * 6));
+	glEnableVertexAttribArray(1);
+
+	glBindVertexArray(logo_VAO[1]);     // VAO 바인딩
+	glBindBuffer(GL_ARRAY_BUFFER, logo_VBO[1]); // VBO 바인딩
+
+	logo_vertexData = readOBJ("logoboard.obj");
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * logo_vertexData.size() * 3, logo_vertexData.data(), GL_STATIC_DRAW);
+
+	logo_vertexCount[1] = logo_vertexData.size() / 3;
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(sizeof(float) * 6));
+	glEnableVertexAttribArray(1);
+
+
+}
+
 void main(int argc, char** argv)
 {
 	float width = 800.0f;
@@ -373,6 +416,7 @@ void main(int argc, char** argv)
 	make_shaderProgram(); 
 	INITBuffer();
 	DuckBuffer();
+	LogoBuffer();
 
 	glutDisplayFunc(drawScene); 
 	glutKeyboardFunc(Keyboard); 
@@ -521,6 +565,11 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'r':
 		isAlive = true;
+		break;
+
+	case 13: 
+		std::cout << "Enter key pressed!" << std::endl;
+		startmode = false;
 		break;
 
 	}//key 스위치문
@@ -705,6 +754,8 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 
 		glUseProgram(shaderProgramID);
 
+		if(startmode) logo(modelLoc, objectColor, glm::vec3(0, 0, 0), logoAngle);
+
 		//타일 그리기
 		for (int i = 0; i < numOfLines; i++) {
 			for (int j = 0; j < 15; j++) {
@@ -822,6 +873,12 @@ void TimerFunction(int v) {
 	if (sun_angle >= glm::two_pi<float>()) {
 		sun_angle -= glm::two_pi<float>(); 
 	}
+
+	//logoAngle = -10.0f * glm::sin(glm::radians(logoSpeed)) - 10.0f; 
+	if (logoAngle <= -70.0f || logoAngle >= -30.0f) {
+		logoSpeed = -logoSpeed;  // 방향 반전
+	}
+	logoAngle += logoSpeed;  // 각도 갱신
 
 	update_wing();
 	glutPostRedisplay(); // 화면 재출력
