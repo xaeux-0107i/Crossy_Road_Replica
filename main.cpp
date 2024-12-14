@@ -510,6 +510,9 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 	case '=':
 		sun_time = 300.0f;
 		break;
+	
+	case 'p':
+		sun_time = 0.0f;
 
 	}//key 스위치문
 
