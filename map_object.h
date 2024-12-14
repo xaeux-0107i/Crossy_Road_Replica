@@ -18,7 +18,8 @@ struct Line {
 	std::time_t start_time;
 	int lineNum;
 	int direction;
-
+	int itemType;
+	int cloudNum;
 	void update_line();
 };
 
@@ -26,5 +27,8 @@ void draw_grass(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos);
 void draw_road(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos);
 void draw_tree(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos);
 void draw_stone(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos);
+void draw_item(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos, int itemType);
+void draw_cloud(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos);
+void draw_cloud2(GLint modelLoc, glm::vec3 objectColor, glm::vec3 pos);
 void create_new_line(int i);
 void init_lines();

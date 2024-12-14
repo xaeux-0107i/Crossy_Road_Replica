@@ -26,17 +26,19 @@ GLvoid Reshape(int w, int h);
 GLvoid Keyboard(unsigned char, int, int);
 GLvoid SpecialKeys(int, int, int);
 void Mouse(int, int, int, int);
+void Motion(int, int);
 void TimerFunction(int v);
+void TimerFunction2(int v);
 GLvoid INITBuffer();
 GLvoid DuckBuffer();
 int isCollide(char key);
 int isCollideWithCar(glm::vec3 pos);
+int isCollideWithCloud(glm::vec3 pos);
 void update_wing();
 void fly_wing();
 void change_camera_direction(float duckDegree);
 
 std::vector<glm::vec3> readOBJ(std::string filename);
-GLuint vertexCount[3];
 
 GLint width = 800, height = 600;
 GLuint shaderProgramID; 
@@ -49,10 +51,14 @@ int camera_mode = 0;
 float sun_angle = 90.0f;
 float sun_time = 30.0f;
 float light_strength = 1.0f;
+float prevMouseX = 0.0;
+int characterMode = 0;
+int isBlending = 0;
 
 //charcter
 GLuint VAO[3];
 GLuint VBO[3];
+GLuint vertexCount[3];
 
 GLuint Duck_VAO[6];
 GLuint Duck_VBO[6];
@@ -72,8 +78,11 @@ float lightY = 10.0f ;
 
 float characterX = 0.0f;
 float duckDegree = 180.0;
+float cameraDegree = 0;
 float duckHeight = 0.26;
+float characterScale = 30.0f;
 bool isAlive = true;
+bool isDragging = false;
 
 float rotationSpeed = 2.0f;
 float wingAngle = 0.0f;
@@ -82,6 +91,7 @@ float wingAngle = 0.0f;
 bool isJumping = false; // 점프 상태
 float jumpSpeed = 0.2f; // 점프 속도
 float gravity = -0.01f; // 중력
+bool jump2 = false; // 구름 위에서 한 번 더 점프
 
 glm::mat4 view = glm::lookAt(
 	glm::vec3(cameraX, cameraY, cameraZ), // 카메라 위치
@@ -290,8 +300,8 @@ GLvoid DuckBuffer()
 
 GLvoid INITBuffer()
 {
-	glGenVertexArrays(2, VAO); // VAO 생성
-	glGenBuffers(2, VBO);      // VBO 생성
+	glGenVertexArrays(3, VAO); // VAO 생성
+	glGenBuffers(3, VBO);      // VBO 생성
 
 	glBindVertexArray(VAO[1]);     // VAO 바인딩
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]); // VBO 바인딩
@@ -300,6 +310,34 @@ GLvoid INITBuffer()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexData.size() * 3, vertexData.data(), GL_STATIC_DRAW);
 
 	vertexCount[1] = vertexData.size() / 3;
+
+	// 버텍스 위치 (location = 0)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(sizeof(float) * 6));
+	glEnableVertexAttribArray(1);
+
+	glBindVertexArray(VAO[2]);     // VAO 바인딩
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]); // VBO 바인딩
+
+	vertexData = readOBJ("sphere.obj");
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexData.size() * 3, vertexData.data(), GL_STATIC_DRAW);
+
+	vertexCount[2] = vertexData.size() / 3;
+
+	// 버텍스 위치 (location = 0)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(sizeof(float) * 6));
+	glEnableVertexAttribArray(1);
+
+	glBindVertexArray(VAO[0]);     // VAO 바인딩
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]); // VBO 바인딩
+
+	vertexData = readOBJ("cloud.obj");
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexData.size() * 3, vertexData.data(), GL_STATIC_DRAW);
+
+	vertexCount[0] = vertexData.size() / 3;
 
 	// 버텍스 위치 (location = 0)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
@@ -336,6 +374,7 @@ void main(int argc, char** argv)
 	glutKeyboardFunc(Keyboard); 
 	glutSpecialFunc(SpecialKeys); 
 	glutMouseFunc(Mouse); 
+	glutMotionFunc(Motion);
 	glutReshapeFunc(Reshape);
 	glutTimerFunc(msecs, TimerFunction, 1); // 타이머 함수 설정
 	glutMainLoop();
@@ -362,8 +401,8 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 				}
 			}
 		}
-		duckDegree = 180.0;
-		change_camera_direction(duckDegree);
+		duckDegree = cameraDegree = 180.0;
+		change_camera_direction(cameraDegree);
 		break;
 	case 's':
 		if (isCollide(key) && isAlive) {
@@ -379,8 +418,8 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 				}
 			}
 		}
-		duckDegree = 0.0;
-		change_camera_direction(duckDegree);
+		duckDegree = cameraDegree = 0.0;
+		change_camera_direction(cameraDegree);
 		break;
 	case 'd':
 		if (isCollide(key) && characterX != -7.0 && isAlive) {
@@ -398,8 +437,8 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 
 			characterX -= 1.0;
 		}
-		duckDegree = 90.0;
-		change_camera_direction(duckDegree);
+		duckDegree = cameraDegree = 90.0;
+		change_camera_direction(cameraDegree);
 		break;
 	case 'a':
 		if (isCollide(key) && characterX != 7.0 && isAlive) {
@@ -416,16 +455,31 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 			}
 			characterX += 1.0;
 		}
-		duckDegree = 270.0;
-		change_camera_direction(duckDegree);
+		duckDegree = cameraDegree = 270.0;
+		change_camera_direction(cameraDegree);
 		break;
 
 	case ' ':  //이건 스페이스바
+	{
 		//std::cout << "Spacebar" << std::endl;
 		if (!isJumping) {
 			isJumping = true;
-			jumpSpeed = 0.2f; 
+			jumpSpeed = 0.2f;
 		}
+
+		int n = 0;
+		for (int i = 0; i < 16; i++) {
+			if (line[i].cloudNum != 0) {
+				if (isCollideWithCloud(line[i].floorPosition[line[i].cloudNum])) n = 1;
+			}
+		}
+
+		if (n == 1) {
+			isJumping = true;
+			jumpSpeed = 0.2f;
+			jump2 = true;
+		}
+	}
 		break;
 
 	case 27: // ESC 키
@@ -462,7 +516,6 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 	if (key != 'q') {
 		glutPostRedisplay(); // 화면 재출력
 	}
-	std::cout << key << '\n';
 }
 
 GLvoid SpecialKeys(int key, int x, int y) {
@@ -475,10 +528,28 @@ void Mouse(int button, int state, int x, int y) {
 
 
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) { // 마우스 좌클릭
-
+		isDragging = true;
+		prevMouseX = x;
+		cameraDegree = duckDegree;
+	} else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) { // 마우스 떼기
+		isDragging = false;
+		camera_lookat_X = sin(glm::radians(duckDegree));
+		camera_lookat_z = cos(glm::radians(duckDegree));
 	}
 
 	glutPostRedisplay(); // 화면 재출력
+}
+
+void Motion(int x, int y) {
+	if (isDragging) {
+		// 마우스 이동량에 따라 cameraDegree 변경
+		int deltaX = x - prevMouseX;
+		cameraDegree += deltaX * 0.1f; // 이동량에 비례하여 각도 업데이트 (0.1은 민감도)
+		prevMouseX = x; // 현재 마우스 위치를 이전 위치로 갱신
+		camera_lookat_X = sin(glm::radians(cameraDegree));
+		camera_lookat_z = cos(glm::radians(cameraDegree));
+		glutPostRedisplay(); // 화면 재출력
+	}
 }
 
 void make_vertexShaders()
@@ -609,6 +680,7 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 		glUniform3fv(glGetUniformLocation(shaderProgramID, "objectColor"), 1, &objectColor[0]);
 		glUniform1f(glGetUniformLocation(shaderProgramID, "light_strength"), light_strength);
 
+
 		// 행렬을 셰이더로 전달
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
@@ -620,14 +692,6 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &model[0][0]);
 
 		glUseProgram(shaderProgramID);
-
-		//
-		//오리
-		if (isAlive) {
-			duck(modelLoc, objectColor, glm::vec3(0, 0, 0), 30.0f, duckDegree, duckHeight);
-			wing(modelLoc, objectColor, glm::vec3(0, 0, 0), 30.0f, duckDegree, duckHeight, wingAngle);
-		}
-
 
 		//타일 그리기
 		for (int i = 0; i < numOfLines; i++) {
@@ -655,6 +719,42 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 				car[i].drawCar(modelLoc, objectColor);
 			}
 		}
+
+		// 아이템 그리기
+		for (int i = 0; i < 16; i++) {
+			if (line[i].itemType != 0) {
+				draw_item(modelLoc, objectColor, line[i].floorPosition[7], line[i].itemType);
+			}
+		}
+
+		glEnable(GL_BLEND);
+		glEnable(GL_CULL_FACE);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		if (characterMode == 1) isBlending = 1;
+		glUniform1i(glGetUniformLocation(shaderProgramID, "isBlending"), isBlending);
+		//오리
+		if (isAlive) {
+			duck(modelLoc, objectColor, glm::vec3(0, 0, 0), characterScale, duckDegree, duckHeight);
+			wing(modelLoc, objectColor, glm::vec3(0, 0, 0), characterScale, duckDegree, duckHeight, wingAngle);
+		}
+
+		isBlending = 2;
+		glUniform1i(glGetUniformLocation(shaderProgramID, "isBlending"), isBlending);
+		// 구름 그리기
+		for (int i = 0; i < 16; i++) {
+			if (line[i].cloudNum != 0) {
+				if (isCollideWithCloud(line[i].floorPosition[line[i].cloudNum])) {
+					draw_cloud2(modelLoc, objectColor, line[i].floorPosition[line[i].cloudNum]);
+				}
+				else {
+					draw_cloud(modelLoc, objectColor, line[i].floorPosition[line[i].cloudNum]);
+				}
+			}
+		}
+		glDisable(GL_BLEND);
+		glDisable(GL_CULL_FACE);
+		isBlending = 0;
+		glUniform1i(glGetUniformLocation(shaderProgramID, "isBlending"), isBlending);
 	}
 	glutSwapBuffers(); // 화면에 출력하기
 }
@@ -671,20 +771,32 @@ void TimerFunction(int v) {
 	for (int i = 0; i < 100; i++) {
 		if (car[i].active) {
 			car[i].updateCar();
-			if (isCollideWithCar(car[i].pos)) isAlive = false;
+			if (isCollideWithCar(car[i].pos) &&  characterMode == 0) isAlive = false;
+			if (isCollideWithCar(car[i].pos) && characterMode == 2) car[i].active = false;
 		}
 	}
 
 	if (isJumping) {
-		duckHeight += jumpSpeed;   
-		jumpSpeed += gravity;       
-		fly_wing();
+		int n = 0;
+		for (int i = 0; i < 16; i++) {
+			if (line[i].cloudNum != 0) {
+				if (isCollideWithCloud(line[i].floorPosition[line[i].cloudNum])) n = 1;
+			}
+		}
 
-		// 바닥에 도달
-		if (duckHeight <= 0.26f) {
-			duckHeight = 0.26f;     
-			isJumping = false;      
-			jumpSpeed = 0.0f;      
+		if (jump2) n = 0;
+		if (n == 0) {
+			duckHeight += jumpSpeed;
+			jumpSpeed += gravity;
+			fly_wing();
+
+			// 바닥에 도달
+			if (duckHeight <= 0.26f) {
+				duckHeight = 0.26f;
+				isJumping = false;
+				jumpSpeed = 0.0f;
+				if (jump2) jump2 = false;
+			}
 		}
 	}
 
@@ -699,6 +811,15 @@ void TimerFunction(int v) {
 	glutTimerFunc(msecs, TimerFunction, 1); // 타이머 함수 설정
 }
 
+// 아이템 타이머
+void TimerFunction2(int v) {
+	characterMode = 0;
+	duckHeight = 0.26;
+	characterScale = 30.0f;
+	std::cout << "item off\n";
+};
+
+// 장애물과 충돌 처리
 int isCollide(char key) {
 	glm::vec3 characterCoord;
 	switch (key) {
@@ -717,12 +838,27 @@ int isCollide(char key) {
 
 	}
 
-
 	for (int i = 0; i < 16; i++) {
 		for (int j = 0; j < 15; j++) {
-			if ((line[i].floorPosition[j] == characterCoord) && line[i].isTree[j] != 0 && line[i].floorType == 0) {
+			if ((line[i].floorPosition[j] == characterCoord) && duckHeight < 1.0 &&
+				line[i].isTree[j] != 0 && line[i].floorType == 0) {
 				return false;
 			}
+		}
+		
+		if (line[i].floorPosition[7] == characterCoord && line[i].itemType != 0) {
+			switch (line[i].itemType) {
+			case 1: // 투명화
+				characterMode = 1;
+				break;
+			case 2: // 거대화
+				characterMode = 2;
+				duckHeight = 0.52;
+				characterScale = 60.0f;
+				break;
+			}
+			glutTimerFunc(5000, TimerFunction2, 2); // 타이머 함수 설정
+			line[i].itemType = 0;
 		}
 	}
 
@@ -736,6 +872,18 @@ int isCollideWithCar(glm::vec3 pos) {
 	if (pos.x + 0.375 < 0 - 0.3) return false; // A의 오른쪽이 B의 왼쪽을 넘음
 	if (pos.z - 0.2 > 0 + 0.3) return false; // A의 아래쪽이 B의 위쪽을 넘음
 	if (pos.z + 0.2 / 2 < 0 - 0.3) return false; // A의 위쪽이 B의 아래쪽을 넘음
+	if (duckHeight > 0.7) return false; // y축 고려
+	return true; // 충돌
+}
+
+int isCollideWithCloud(glm::vec3 pos) {
+	// 자동차 x 너비 - 0.75, z 너비 - 0.4
+	// 캐릭터 x, z 너비 - 0.6
+	if (pos.x - 0.7 > 0 + 0.3) return false; // A의 왼쪽이 B의 오른쪽을 넘음
+	if (pos.x + 0.7 < 0 - 0.3) return false; // A의 오른쪽이 B의 왼쪽을 넘음
+	if (pos.z - 0.7 > 0 + 0.3) return false; // A의 아래쪽이 B의 위쪽을 넘음
+	if (pos.z + 0.7 / 2 < 0 - 0.3) return false; // A의 위쪽이 B의 아래쪽을 넘음
+	if (duckHeight > 1.5 - 0.13 && duckHeight < 1.5 + 0.13) return false; // y축 고려
 	return true; // 충돌
 }
 
@@ -757,7 +905,6 @@ void update_wing() {
 		}
 	}
 }
-
 
 void fly_wing() {
 	if (isIncreasing) {
