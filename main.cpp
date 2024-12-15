@@ -780,8 +780,6 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 
 		if(startmode) logo(modelLoc, objectColor, glm::vec3(0, 0, 0), logoAngle);
 
-		if (!startmode) drawScore();
-
 		//타일 그리기
 		for (int i = 0; i < numOfLines; i++) {
 			for (int j = 0; j < 15; j++) {
@@ -849,6 +847,8 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 		glDisable(GL_CULL_FACE);
 		isBlending = 0;
 		glUniform1i(glGetUniformLocation(shaderProgramID, "isBlending"), isBlending);
+
+		if (!startmode) drawScore();
 	}
 	glutSwapBuffers(); // 화면에 출력하기
 }
@@ -913,7 +913,7 @@ void TimerFunction(int v) {
 	}
 	logoAngle += logoSpeed;  // 각도 갱신
 
-	update_wing();
+	if(isAlive) update_wing();
 	glutPostRedisplay(); // 화면 재출력
 	glutTimerFunc(msecs, TimerFunction, 1); // 타이머 함수 설정
 }
