@@ -16,6 +16,8 @@
 #include "map_object.h"
 #include "duck.h"
 #include "car.h"
+#include "sound.h"
+
 
 void make_vertexShaders();
 void make_fragmentShaders();
@@ -422,6 +424,8 @@ void main(int argc, char** argv)
 	glutInitWindowSize(width, height);
 	glutCreateWindow("crossy_road");
 
+	PlaySound(TEXT("crossy_road_bgm.wav"), NULL, SND_ASYNC | SND_LOOP);
+
 	glewExperimental = GL_TRUE;
 	glewInit();
 
@@ -540,6 +544,9 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 				jumpSpeed = 0.2f;
 				jump2 = true;
 			}
+
+
+			//PlaySound(TEXT("duck_jump.wav"), NULL, SND_ASYNC | SND_ALIAS);
 		}
 	}
 		break;
