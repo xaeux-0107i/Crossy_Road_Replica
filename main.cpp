@@ -124,6 +124,8 @@ GLuint logo_VAO[6];
 GLuint logo_VBO[6];
 GLuint logo_vertexCount[6];
 
+int score = 0;
+
 // 자동차
 Car car[100];
 
@@ -144,6 +146,15 @@ char* filetobuf(const char* file) {
 	buf[length] = 0;
 
 	return buf;
+}
+
+void drawScore() {
+	glWindowPos2i(350, height - 40);
+
+	std::string scoreText = "Score: " + std::to_string(score);
+	for (char c : scoreText) {
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, c);
+	}
 }
 
 std::vector<glm::vec3> readOBJ(std::string filename)
@@ -452,6 +463,7 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 			duckDegree = cameraDegree = 180.0;
 			change_camera_direction(cameraDegree);
 		}
+		score += 10;
 		break;
 	case 's':
 		if (isCollide(key) && isAlive) {
@@ -569,6 +581,7 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 
 	case 'r':
 		isAlive = true;
+		score = 0;
 		break;
 
 	case 13: 
@@ -760,6 +773,8 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 
 		if(startmode) logo(modelLoc, objectColor, glm::vec3(0, 0, 0), logoAngle);
 
+		if (!startmode) drawScore();
+
 		//타일 그리기
 		for (int i = 0; i < numOfLines; i++) {
 			for (int j = 0; j < 15; j++) {
@@ -880,11 +895,10 @@ void TimerFunction(int v) {
 	//}
 
 
-	// 태양 각도 갱신 (0도 ~ 180도에서 천천히 왕복)
 	if (sun_move) {
 		//sun_angle = glm::radians(90.0f) * (1.0f + sin(glm::radians(sun_time)));
 		sun_angle = glm::radians(30.0f) + glm::radians(120.0f) * (0.5f * (1.0f + sin(glm::radians(sun_time))));
-		sun_time += 0.1f; // 시간의 증가 속도를 조정하여 천천히 움직이도록 설정
+		sun_time += 0.1f; 
 	}
 
 	if (logoAngle <= -70.0f || logoAngle >= -30.0f) {
@@ -936,11 +950,13 @@ int isCollide(char key) {
 			switch (line[i].itemType) {
 			case 1: // 투명화
 				characterMode = 1;
+				score += 100;
 				break;
 			case 2: // 거대화
 				characterMode = 2;
 				duckHeight = 0.52;
 				characterScale = 60.0f;
+				score += 100;
 				break;
 			}
 			glutTimerFunc(5000, TimerFunction2, 2); // 타이머 함수 설정
