@@ -131,6 +131,15 @@ int score = 0;
 // 자동차
 Car car[100];
 
+void drawScore() {
+	glWindowPos2i(350, height - 40);
+
+	std::string scoreText = "Score: " + std::to_string(score);
+	for (char c : scoreText) {
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, c);
+	}
+}
+
 char* filetobuf(const char* file) {
 	FILE* fptr;
 	long length;
@@ -150,14 +159,7 @@ char* filetobuf(const char* file) {
 	return buf;
 }
 
-void drawScore() {
-	glWindowPos2i(350, height - 40);
 
-	std::string scoreText = "Score: " + std::to_string(score);
-	for (char c : scoreText) {
-		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, c);
-	}
-}
 
 std::vector<glm::vec3> readOBJ(std::string filename)
 {
@@ -779,6 +781,8 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 		glUseProgram(shaderProgramID);
 
 		if(startmode) logo(modelLoc, objectColor, glm::vec3(0, 0, 0), logoAngle);
+	
+		if (!startmode) drawScore();
 
 		//타일 그리기
 		for (int i = 0; i < numOfLines; i++) {
@@ -848,7 +852,7 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 		isBlending = 0;
 		glUniform1i(glGetUniformLocation(shaderProgramID, "isBlending"), isBlending);
 
-		if (!startmode) drawScore();
+		
 	}
 	glutSwapBuffers(); // 화면에 출력하기
 }
